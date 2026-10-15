@@ -1,0 +1,12 @@
+@model StatusBadgeViewModel
+@{
+    // Status is never shown by colour alone: every badge has an icon glyph and a text label.
+    var (icon, cls) = Model.Kind switch
+    {
+        BadgeKind.Success => ("✓", "badge--success"),
+        BadgeKind.Warning => ("!", "badge--warning"),
+        BadgeKind.Error => ("✕", "badge--error"),
+        _ => ("•", "badge--info")
+    };
+}
+<span class="badge @cls"><span aria-hidden="true">@icon</span> @Model.Label</span>

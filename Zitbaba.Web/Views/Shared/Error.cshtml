@@ -1,0 +1,8 @@
+@model ErrorViewModel
+@{ ViewData["Title"] = "Something went wrong"; }
+<h1>Something went wrong</h1>
+<p>We couldn't complete that request. Please try again, or go back to the <a asp-controller="Home" asp-action="Index">home page</a>.</p>
+@if (Model.ShowRequestId)
+{
+    <p class="muted">Reference: <code>@Model.RequestId</code></p>
+}

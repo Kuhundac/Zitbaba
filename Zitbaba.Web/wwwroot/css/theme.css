@@ -1,0 +1,15 @@
+:root {
+    --primary: #6D28D9;
+    --primary-dark: #4C1D95;
+    --primary-tint: #F3E8FF;
+    --bg: #FFFFFF;
+    --text: #1F2937;
+    --muted: #6B7280;
+    --alert: #DC2626;
+    --success: #15803D;
+    --warning: #B45309;
+
+    --radius: 10px;
+    --border: #E5E7EB;
+    --tap: 44px;
+}

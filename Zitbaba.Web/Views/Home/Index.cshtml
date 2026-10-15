@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "Home";
+    var categories = new[]
+    {
+        "Fashion", "Electronics", "Food and Snacks", "Books and Stationery",
+        "Beauty and Personal Care", "Home and Hostel", "Services", "Other"
+    };
+}
+<section class="hero">
+    <h1>Buy and sell on campus</h1>
+    <p>Find what you need from Copperbelt University students and approved sellers.</p>
+    <form class="search-form" role="search" asp-controller="Home" asp-action="Search" method="get">
+        <label for="q" class="visually-hidden">Search products</label>
+        <input id="q" name="q" type="search" placeholder="Search products, e.g. calculator" autocomplete="off" />
+        <button type="submit" class="btn">Search</button>
+    </form>
+</section>
+
+<section aria-labelledby="cats-heading">
+    <h2 id="cats-heading">Browse categories</h2>
+    <ul class="chips">
+        @foreach (var c in categories)
+        {
+            <li><a class="chip" asp-controller="Home" asp-action="Categories">@c</a></li>
+        }
+    </ul>
+</section>
+
+<section aria-labelledby="recent-heading">
+    <h2 id="recent-heading">Recently added</h2>
+    <p class="muted">Products will appear here once sellers start listing (coming on Days 2–3).</p>
+</section>

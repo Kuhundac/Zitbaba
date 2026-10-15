@@ -1,0 +1,37 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Register"; }
+<div class="card form-card">
+    <h1>Create your account</h1>
+    <partial name="_ValidationSummary" />
+    <form asp-action="Register" method="post" novalidate>
+        <div class="field">
+            <label asp-for="FullName"></label>
+            <input asp-for="FullName" autocomplete="name" />
+            <span asp-validation-for="FullName" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" type="email" autocomplete="email" />
+            <span asp-validation-for="Email" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Phone"></label>
+            <input asp-for="Phone" type="tel" autocomplete="tel" />
+            <span class="hint">Never shown publicly.</span>
+            <span asp-validation-for="Phone" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" autocomplete="new-password" />
+            <span class="hint">At least 8 characters with an uppercase letter, a lowercase letter and a digit.</span>
+            <span asp-validation-for="Password" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" autocomplete="new-password" />
+            <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+        </div>
+        <button type="submit" class="btn btn--block">Register</button>
+    </form>
+    <p class="form-links">Already registered? <a asp-action="Login">Login</a></p>
+</div>
