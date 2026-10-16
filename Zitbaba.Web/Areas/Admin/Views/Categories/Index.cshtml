@@ -1,0 +1,72 @@
+﻿@model IReadOnlyList<CategoryRow>
+@{
+    ViewData["Title"] = "Categories";
+    var message = TempData["CategoryMessage"] as string;
+    var error = TempData["CategoryError"] as string;
+}
+<div class="page-head">
+    <h1>Categories</h1>
+    <a class="btn" asp-area="Admin" asp-controller="Categories" asp-action="Create">New category</a>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert--success" role="status">@message</div>
+}
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert--error" role="alert">@error</div>
+}
+
+@if (Model.Count == 0)
+{
+    <p class="muted">No categories yet.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Products</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    var label = row.ParentName is null ? row.Name : "↳ " + row.Name;
+                    var badge = row.IsActive
+                        ? new StatusBadgeViewModel("Active", BadgeKind.Success)
+                        : new StatusBadgeViewModel("Inactive", BadgeKind.Warning);
+                    var toggleText = row.IsActive ? "Deactivate" : "Reactivate";
+                    var canDelete = row.ProductCount == 0 && row.ChildCount == 0;
+                    <tr>
+                        <td>@label</td>
+                        <td>@row.ProductCount</td>
+                        <td><partial name="_StatusBadge" model="badge" /></td>
+                        <td>
+                            <div class="row-actions">
+                                <a class="btn btn--secondary" asp-area="Admin" asp-controller="Categories" asp-action="Edit" asp-route-id="@row.CategoryId">Edit</a>
+                                <form asp-area="Admin" asp-controller="Categories" asp-action="Toggle" method="post">
+                                    <input type="hidden" name="id" value="@row.CategoryId" />
+                                    <input type="hidden" name="active" value="@(!row.IsActive)" />
+                                    <button type="submit" class="btn btn--secondary">@toggleText</button>
+                                </form>
+                                @if (canDelete)
+                                {
+                                    <form asp-area="Admin" asp-controller="Categories" asp-action="Delete" method="post">
+                                        <input type="hidden" name="id" value="@row.CategoryId" />
+                                        <button type="submit" class="btn btn--secondary" onclick="return confirm('Delete this category?')">Delete</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

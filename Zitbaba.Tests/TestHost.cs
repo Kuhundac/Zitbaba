@@ -29,6 +29,7 @@ internal sealed class TestHost : IDisposable
             .AddEntityFrameworkStores<ZitbabaDbContext>();
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISellerApplicationService, SellerApplicationService>();
         _provider = services.BuildServiceProvider();
     }
@@ -45,3 +46,4 @@ internal sealed class TestHost : IDisposable
 
     public void Dispose() => _provider.Dispose();
 }
+

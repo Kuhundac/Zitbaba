@@ -1,0 +1,36 @@
+﻿@model CategoryFormModel
+@{
+    var isNew = Model.CategoryId == 0;
+    ViewData["Title"] = isNew ? "New category" : "Edit category";
+    var formAction = isNew ? "Create" : "Edit";
+}
+<div class="card form-card">
+    <h1>@ViewData["Title"]</h1>
+    <partial name="_ValidationSummary" />
+    <form asp-area="Admin" asp-controller="Categories" asp-action="@formAction" method="post" novalidate>
+        <input type="hidden" asp-for="CategoryId" />
+        <div class="field">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" type="text" maxlength="100" />
+            <span asp-validation-for="Name" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="ParentCategoryId"></label>
+            <select asp-for="ParentCategoryId" asp-items="Model.Parents">
+                <option value="">(None, top level)</option>
+            </select>
+            <span class="hint">Only one level of subcategory is allowed.</span>
+            <span asp-validation-for="ParentCategoryId" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="SortOrder"></label>
+            <input asp-for="SortOrder" type="number" min="0" max="9999" />
+            <span class="hint">Lower numbers appear first.</span>
+            <span asp-validation-for="SortOrder" class="field-error"></span>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn--block">Save</button>
+            <a class="btn btn--secondary btn--block" asp-area="Admin" asp-controller="Categories" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

@@ -99,3 +99,17 @@ input[type=text], input[type=email], input[type=tel], input[type=password], inpu
 .pager a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; }
 .action-form { margin-top: 16px; }
 .action-form textarea { width: 100%; }
+
+/* categories-step3 */
+.page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th, .data-table td { padding: .6rem .5rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+.row-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.row-actions form { margin: 0; }
+.btn--secondary { background: var(--bg); color: var(--primary-dark); border: 1px solid var(--primary); }
+.btn--secondary:hover { background: var(--primary-tint); color: var(--primary-dark); }
+.alert--success { border: 1px solid var(--success); color: var(--success); background: #F0FDF4; }
+.alert--success::before { content: "\2713  "; font-weight: 700; }
+.form-actions { display: flex; flex-direction: column; gap: .5rem; }
+select, input[type=number] { min-height: var(--tap); padding: 0 .75rem; border: 1px solid #9CA3AF; border-radius: var(--radius); font: inherit; width: 100%; background: var(--bg); }
