@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -97,6 +97,11 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ISellerApplicationService, SellerApplicationService>();
+        services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
+        services.AddScoped<IAuditService, AuditService>();
         return services;
     }
 }
+
+

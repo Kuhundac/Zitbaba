@@ -1,0 +1,85 @@
+﻿@model SellerApplicationPageModel
+@using Zitbaba.Web.Domain.Enums
+@{
+    ViewData["Title"] = "Become a seller";
+    var status = Model.Info?.Status;
+    var showForm = status is null || status == SellerApplicationStatus.Rejected;
+
+    var pendingBadge = new StatusBadgeViewModel("Pending", BadgeKind.Warning);
+    var suspendedBadge = new StatusBadgeViewModel("Suspended", BadgeKind.Error);
+    var approvedBadge = new StatusBadgeViewModel("Approved", BadgeKind.Success);
+    var rejectedBadge = new StatusBadgeViewModel("Rejected", BadgeKind.Error);
+}
+
+<div class="card form-card">
+    <h1>Become a seller</h1>
+
+    @if (TempData["Message"] is string message)
+    {
+        <p role="status">@message</p>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <p role="alert" class="field-error">@error</p>
+    }
+
+    @if (status == SellerApplicationStatus.Pending)
+    {
+        <p><partial name="_StatusBadge" model="pendingBadge" /></p>
+        <p>Your application for <strong>@Model.Info!.StoreName</strong> is waiting for an admin to review it.</p>
+    }
+    else if (status == SellerApplicationStatus.Suspended)
+    {
+        <p><partial name="_StatusBadge" model="suspendedBadge" /></p>
+        <p>Your seller account <strong>@Model.Info!.StoreName</strong> is suspended, so you cannot apply again.</p>
+        @if (!string.IsNullOrWhiteSpace(Model.Info.ReviewReason))
+        {
+            <p>Reason: @Model.Info.ReviewReason</p>
+        }
+    }
+    else if (status == SellerApplicationStatus.Approved)
+    {
+        <p><partial name="_StatusBadge" model="approvedBadge" /></p>
+        <p><a asp-area="Seller" asp-controller="Home" asp-action="Index">Go to your seller dashboard</a></p>
+    }
+
+    @if (showForm)
+    {
+        @if (status == SellerApplicationStatus.Rejected)
+        {
+            <p><partial name="_StatusBadge" model="rejectedBadge" /></p>
+            @if (!string.IsNullOrWhiteSpace(Model.Info!.ReviewReason))
+            {
+                <p>Reason: @Model.Info.ReviewReason</p>
+            }
+            <p>You can update your details and send the application again.</p>
+        }
+        else
+        {
+            <p>Tell us about your store. An admin reviews every application.</p>
+        }
+
+        <partial name="_ValidationSummary" />
+        <form asp-action="Index" method="post" novalidate>
+            <div class="field">
+                <label asp-for="Form.StoreName"></label>
+                <input asp-for="Form.StoreName" autocomplete="off" />
+                <span asp-validation-for="Form.StoreName" class="field-error"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Form.Description"></label>
+                <textarea asp-for="Form.Description" rows="4"></textarea>
+                <span asp-validation-for="Form.Description" class="field-error"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Form.ApplicationNotes"></label>
+                <textarea asp-for="Form.ApplicationNotes" rows="4"></textarea>
+                <span class="hint">For example: snacks, textbooks, phone accessories.</span>
+                <span asp-validation-for="Form.ApplicationNotes" class="field-error"></span>
+            </div>
+            <button type="submit" class="btn btn--block">
+                @(status == SellerApplicationStatus.Rejected ? "Resubmit application" : "Send application")
+            </button>
+        </form>
+    }
+</div>

@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Zitbaba.Web.Data;
 using Zitbaba.Web.Domain.Entities;
@@ -19,12 +20,16 @@ internal sealed class TestHost : IDisposable
         var services = new ServiceCollection();
         services.AddLogging();
         services.AddDbContext<ZitbabaDbContext>(o =>
-            o.UseInMemoryDatabase("zitbaba-" + Guid.NewGuid()));
+            o.UseInMemoryDatabase("zitbaba-" + Guid.NewGuid())
+             // The in-memory provider has no real transactions; ignore the warning so services can use them.
+             .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning)));
         services
             .AddIdentityCore<ApplicationUser>(IdentityConfig.Configure)
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ZitbabaDbContext>();
         services.AddScoped<IRegistrationService, RegistrationService>();
+        services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<ISellerApplicationService, SellerApplicationService>();
         _provider = services.BuildServiceProvider();
     }
 

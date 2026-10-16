@@ -1,3 +1,10 @@
-@{ ViewData["Title"] = "Admin"; }
+﻿@{ ViewData["Title"] = "Admin"; }
 <h1>Admin dashboard</h1>
-<p class="muted">Seller approvals, category management and user moderation arrive on Days 2 and 6.</p>
+
+<div class="card list-card">
+    <h2>Seller applications</h2>
+    <p>Review, approve, reject or suspend sellers.</p>
+    <a class="btn" asp-area="Admin" asp-controller="SellerApprovals" asp-action="Index">Review applications</a>
+</div>
+
+<p class="muted">Category management and user moderation arrive later.</p>

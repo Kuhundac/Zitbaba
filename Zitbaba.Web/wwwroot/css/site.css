@@ -90,3 +90,12 @@ input[type=text], input[type=email], input[type=tel], input[type=password], inpu
 .details dd { margin: 0; }
 
 .site-footer { border-top: 1px solid var(--border); padding: 1rem 0; color: var(--muted); font-size: .875rem; }
+
+/* Day 2: admin lists and action forms */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 12px 0; }
+.filter-bar a, .filter-bar strong { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; }
+.list-card { margin-bottom: 12px; }
+.pager { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 16px; }
+.pager a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; }
+.action-form { margin-top: 16px; }
+.action-form textarea { width: 100%; }

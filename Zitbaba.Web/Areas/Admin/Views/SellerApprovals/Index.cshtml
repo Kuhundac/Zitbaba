@@ -1,0 +1,71 @@
+﻿@model SellerApprovalsIndexModel
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "Seller applications";
+    var filters = new[] { "Pending", "Approved", "Rejected", "Suspended", "All" };
+    var result = Model.Result;
+}
+
+<h1>Seller applications</h1>
+
+@if (TempData["Message"] is string message)
+{
+    <p role="status">@message</p>
+}
+@if (TempData["Error"] is string error)
+{
+    <p role="alert" class="field-error">@error</p>
+}
+
+<nav class="filter-bar" aria-label="Filter by status">
+    @foreach (var f in filters)
+    {
+        if (f == Model.Filter)
+        {
+            <strong aria-current="true">@f</strong>
+        }
+        else
+        {
+            <a asp-action="Index" asp-route-status="@f">@f</a>
+        }
+    }
+</nav>
+
+@if (result.Items.Count == 0)
+{
+    <p>No applications with this status.</p>
+}
+
+@foreach (var item in result.Items)
+{
+    var badge = SellerStatusBadges.For(item.Status);
+    <div class="card list-card">
+        <h2><a asp-action="Details" asp-route-id="@item.SellerProfileId">@item.StoreName</a></h2>
+        <p><partial name="_StatusBadge" model="badge" /></p>
+        <p>@item.ApplicantName &middot; @item.ApplicantEmail</p>
+        <p class="muted">Applied @item.CreatedAt.ToString("dd MMM yyyy") (UTC)</p>
+    </div>
+}
+
+@if (result.TotalPages > 1)
+{
+    <div class="pager">
+        @if (result.HasPrevious)
+        {
+            <a asp-action="Index" asp-route-status="@Model.Filter" asp-route-page="@(result.Page - 1)">Previous</a>
+        }
+        else
+        {
+            <span></span>
+        }
+        <span>Page @result.Page of @result.TotalPages</span>
+        @if (result.HasNext)
+        {
+            <a asp-action="Index" asp-route-status="@Model.Filter" asp-route-page="@(result.Page + 1)">Next</a>
+        }
+        else
+        {
+            <span></span>
+        }
+    </div>
+}

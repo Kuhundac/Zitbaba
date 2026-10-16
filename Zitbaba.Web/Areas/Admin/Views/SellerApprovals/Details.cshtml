@@ -1,0 +1,73 @@
+﻿@model SellerApprovalDetails
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "Application: " + Model.StoreName;
+    var badge = SellerStatusBadges.For(Model.Status);
+}
+
+<p><a asp-action="Index">Back to applications</a></p>
+
+@if (TempData["Message"] is string message)
+{
+    <p role="status">@message</p>
+}
+@if (TempData["Error"] is string error)
+{
+    <p role="alert" class="field-error">@error</p>
+}
+
+<div class="card">
+    <h1>@Model.StoreName</h1>
+    <p><partial name="_StatusBadge" model="badge" /></p>
+
+    <p><strong>Applicant:</strong> @Model.ApplicantName</p>
+    <p><strong>Email:</strong> @Model.ApplicantEmail</p>
+    <p><strong>Applied:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm") (UTC)</p>
+    <p><strong>Description:</strong> @(string.IsNullOrWhiteSpace(Model.Description) ? "Not provided" : Model.Description)</p>
+    <p><strong>What they plan to sell:</strong> @(string.IsNullOrWhiteSpace(Model.ApplicationNotes) ? "Not provided" : Model.ApplicationNotes)</p>
+
+    @if (Model.ReviewedAt is not null)
+    {
+        <p><strong>Last reviewed:</strong> @Model.ReviewedAt.Value.ToString("dd MMM yyyy HH:mm") (UTC)</p>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.ReviewReason))
+    {
+        <p><strong>Reason:</strong> @Model.ReviewReason</p>
+    }
+</div>
+
+@if (Model.Status == SellerApplicationStatus.Pending)
+{
+    <form asp-action="Approve" asp-route-id="@Model.SellerProfileId" method="post" class="action-form">
+        <button type="submit" class="btn btn--block">Approve seller</button>
+    </form>
+
+    <form asp-action="Reject" asp-route-id="@Model.SellerProfileId" method="post" class="action-form">
+        <div class="field">
+            <label for="reject-reason">Reason for rejecting (5 to 500 characters)</label>
+            <textarea id="reject-reason" name="reason" rows="3" maxlength="500" required></textarea>
+        </div>
+        <button type="submit" class="btn btn--block">Reject application</button>
+    </form>
+}
+else if (Model.Status == SellerApplicationStatus.Approved)
+{
+    <form asp-action="Suspend" asp-route-id="@Model.SellerProfileId" method="post" class="action-form">
+        <div class="field">
+            <label for="suspend-reason">Reason for suspending (5 to 500 characters)</label>
+            <textarea id="suspend-reason" name="reason" rows="3" maxlength="500" required></textarea>
+        </div>
+        <button type="submit" class="btn btn--block">Suspend seller</button>
+    </form>
+}
+else if (Model.Status == SellerApplicationStatus.Suspended)
+{
+    <form asp-action="Reinstate" asp-route-id="@Model.SellerProfileId" method="post" class="action-form">
+        <button type="submit" class="btn btn--block">Reinstate seller</button>
+    </form>
+}
+else
+{
+    <p class="muted">This application was rejected. The applicant can update it and send it again.</p>
+}
