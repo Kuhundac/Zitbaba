@@ -1,6 +1,4 @@
-@using System.Security.Claims
-@using Zitbaba.Web.Infrastructure.Security
-@{
+﻿@{
     var controller = (ViewContext.RouteData.Values["controller"] as string) ?? "";
     var action = (ViewContext.RouteData.Values["action"] as string) ?? "";
     var area = ViewContext.RouteData.Values["area"] as string;
@@ -8,7 +6,6 @@
         area is null && string.Equals(controller, c, StringComparison.OrdinalIgnoreCase)
         && string.Equals(action, a, StringComparison.OrdinalIgnoreCase);
     string Cls(string c, string a) => IsActive(c, a) ? "nav-link is-active" : "nav-link";
-    var signedIn = User.Identity?.IsAuthenticated == true;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +13,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#6D28D9" />
-    <title>@(ViewData["Title"] is string t && t.Length > 0 ? t + " · " : "")Zitbaba</title>
+    <title>@(ViewData["Title"] is string t && t.Length > 0 ? t + " - " : "")Zitbaba</title>
     <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
@@ -25,39 +22,20 @@
 
     <header class="site-header">
         <div class="container header-row">
-            <a class="brand" asp-controller="Home" asp-action="Index">Zitbaba</a>
+            <a class="brand" asp-area="" asp-controller="Home" asp-action="Index">Zitbaba</a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-                <span aria-hidden="true">☰</span><span class="visually-hidden">Menu</span>
+                <span aria-hidden="true">&#9776;</span><span class="visually-hidden">Menu</span>
             </button>
             <nav id="site-nav" class="site-nav" aria-label="Main">
-                <a class="@Cls("Home","Index")" aria-current="@(IsActive("Home","Index") ? "page" : null)" asp-controller="Home" asp-action="Index">Home</a>
-                <a class="@Cls("Home","Categories")" aria-current="@(IsActive("Home","Categories") ? "page" : null)" asp-controller="Home" asp-action="Categories">Categories</a>
-                <a class="@Cls("Home","Search")" aria-current="@(IsActive("Home","Search") ? "page" : null)" asp-controller="Home" asp-action="Search">Search</a>
-                <a class="@Cls("Home","Wishlist")" aria-current="@(IsActive("Home","Wishlist") ? "page" : null)" asp-controller="Home" asp-action="Wishlist">Wishlist</a>
+                <a class="@Cls("Home","Index")" aria-current="@(IsActive("Home","Index") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                <a class="@Cls("Home","Categories")" aria-current="@(IsActive("Home","Categories") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Categories">Categories</a>
+                <a class="@Cls("Home","Search")" aria-current="@(IsActive("Home","Search") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Search">Search</a>
+                <a class="@Cls("Home","Wishlist")" aria-current="@(IsActive("Home","Wishlist") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Wishlist">Wishlist</a>
 
                 <details class="account-menu">
                     <summary class="nav-link">Account</summary>
                     <div class="account-panel">
-                        @if (!signedIn)
-                        {
-                            <a asp-controller="Account" asp-action="Login">Login</a>
-                            <a asp-controller="Account" asp-action="Register">Register</a>
-                        }
-                        else
-                        {
-                            <a asp-controller="Account" asp-action="Profile">Profile</a>
-                            @if (User.IsInRole(RoleNames.Seller))
-                            {
-                                <a asp-area="Seller" asp-controller="Home" asp-action="Index">Seller dashboard</a>
-                            }
-                            @if (User.IsInRole(RoleNames.Admin))
-                            {
-                                <a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a>
-                            }
-                            <form asp-controller="Account" asp-action="Logout" method="post">
-                                <button type="submit" class="link-button">Logout</button>
-                            </form>
-                        }
+                        @await Component.InvokeAsync("AccountMenu")
                     </div>
                 </details>
             </nav>
@@ -70,7 +48,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>© @DateTime.UtcNow.Year Zitbaba · Copperbelt University marketplace · Prices in ZMW</p>
+            <p>&copy; @DateTime.UtcNow.Year Zitbaba &middot; Copperbelt University marketplace &middot; Prices in ZMW</p>
         </div>
     </footer>
 

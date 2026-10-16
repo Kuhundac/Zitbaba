@@ -1,0 +1,31 @@
+﻿@model Zitbaba.Web.Services.AccountMenuState
+
+@if (!Model.SignedIn)
+{
+    <a asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+    <a asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+}
+else
+{
+    <a asp-area="" asp-controller="Account" asp-action="Profile">Profile</a>
+    @if (Model.ShowBecomeSeller)
+    {
+        <a asp-area="" asp-controller="SellerApplication" asp-action="Index">Become a seller</a>
+    }
+    @if (Model.ShowApplicationStatus)
+    {
+        <a asp-area="" asp-controller="SellerApplication" asp-action="Index">Application status</a>
+    }
+    @if (Model.ShowSellerDashboard)
+    {
+        <a asp-area="Seller" asp-controller="Home" asp-action="Index">Seller dashboard</a>
+    }
+    @if (Model.ShowAdmin)
+    {
+        <a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin</a>
+        <a asp-area="Admin" asp-controller="Categories" asp-action="Index">Categories (admin)</a>
+    }
+    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+        <button type="submit" class="link-button">Logout</button>
+    </form>
+}

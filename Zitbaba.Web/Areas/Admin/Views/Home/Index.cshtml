@@ -1,5 +1,17 @@
-﻿@{ ViewData["Title"] = "Admin"; }
+﻿@model Zitbaba.Web.Services.AdminDashboardModel
+@{ ViewData["Title"] = "Admin"; }
 <h1>Admin dashboard</h1>
+
+<div class="stat-grid">
+    <div class="stat">
+        <span class="stat-value">@Model.PendingApplications</span>
+        <span>Pending seller applications</span>
+    </div>
+    <div class="stat">
+        <span class="stat-value">@Model.TotalProducts</span>
+        <span>Products (not removed)</span>
+    </div>
+</div>
 
 <div class="card list-card">
     <h2>Seller applications</h2>
@@ -9,9 +21,6 @@
 
 <div class="card list-card">
     <h2>Categories</h2>
-    <p>Add, rename, reorder and deactivate product categories.</p>
+    <p>Add, rename and deactivate product categories.</p>
     <a class="btn" asp-area="Admin" asp-controller="Categories" asp-action="Index">Manage categories</a>
 </div>
-
-<p class="muted">User moderation arrives later.</p>
-
