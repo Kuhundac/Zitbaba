@@ -101,9 +101,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<ISellerProductService, SellerProductService>();
         return services;
     }
 }
+
 
 
 

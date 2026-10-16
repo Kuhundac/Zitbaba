@@ -1,0 +1,104 @@
+﻿@model SellerProductListModel
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "My products";
+    var message = TempData["ProductMessage"] as string;
+    var error = TempData["ProductError"] as string;
+    var lowBadge = new StatusBadgeViewModel("Low stock", BadgeKind.Warning);
+}
+<div class="page-head">
+    <h1>My products</h1>
+    <a class="btn" asp-area="Seller" asp-controller="Products" asp-action="Create">Add product</a>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert--success" role="status">@message</div>
+}
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert--error" role="alert">@error</div>
+}
+
+@if (Model.TotalCount == 0)
+{
+    <p class="muted">You have no products yet. Add your first one.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Items)
+                {
+                    var statusBadge = ProductStatusBadges.For(row.Status);
+                    <tr>
+                        <td>@row.Name<span class="cell-sub">@row.CategoryName</span></td>
+                        <td>@MoneyFormatter.Zmw(row.Price)</td>
+                        <td>
+                            @row.QuantityAvailable
+                            @if (row.IsLowStock)
+                            {
+                                <partial name="_StatusBadge" model="lowBadge" />
+                            }
+                        </td>
+                        <td><partial name="_StatusBadge" model="statusBadge" /></td>
+                        <td>
+                            <div class="row-actions">
+                                @if (row.CanEdit)
+                                {
+                                    <a class="btn btn--secondary" asp-area="Seller" asp-controller="Products" asp-action="Edit" asp-route-id="@row.ProductId">Edit</a>
+                                }
+                                @if (row.CanDeactivate)
+                                {
+                                    <form asp-area="Seller" asp-controller="Products" asp-action="Deactivate" method="post">
+                                        <input type="hidden" name="id" value="@row.ProductId" />
+                                        <button type="submit" class="btn btn--secondary">Deactivate</button>
+                                    </form>
+                                }
+                                @if (row.CanReactivate)
+                                {
+                                    <form asp-area="Seller" asp-controller="Products" asp-action="Reactivate" method="post">
+                                        <input type="hidden" name="id" value="@row.ProductId" />
+                                        <button type="submit" class="btn btn--secondary">Reactivate</button>
+                                    </form>
+                                }
+                                @if (row.CanRemove)
+                                {
+                                    <form asp-area="Seller" asp-controller="Products" asp-action="Remove" method="post">
+                                        <input type="hidden" name="id" value="@row.ProductId" />
+                                        <button type="submit" class="btn btn--secondary" onclick="return confirm('Remove this product? It will no longer be listed.')">Remove</button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav class="pager" aria-label="Pages">
+            @if (Model.Page > 1)
+            {
+                <a class="btn btn--secondary" asp-area="Seller" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.Page - 1)">Previous</a>
+            }
+            <span>Page @Model.Page of @Model.TotalPages</span>
+            @if (Model.Page < Model.TotalPages)
+            {
+                <a class="btn btn--secondary" asp-area="Seller" asp-controller="Products" asp-action="Index" asp-route-page="@(Model.Page + 1)">Next</a>
+            }
+        </nav>
+    }
+}

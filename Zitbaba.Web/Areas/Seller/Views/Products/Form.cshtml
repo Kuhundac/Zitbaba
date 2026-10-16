@@ -1,0 +1,58 @@
+﻿@model SellerProductFormModel
+@{
+    var isNew = Model.ProductId == Guid.Empty;
+    ViewData["Title"] = isNew ? "Add product" : "Edit product";
+    var formAction = isNew ? "Create" : "Edit";
+}
+<div class="card form-card">
+    <h1>@ViewData["Title"]</h1>
+    <partial name="_ValidationSummary" />
+    <form asp-area="Seller" asp-controller="Products" asp-action="@formAction" method="post" novalidate>
+        <input type="hidden" asp-for="ProductId" />
+        <input type="hidden" asp-for="RowVersion" />
+
+        <div class="field">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" type="text" maxlength="160" />
+            <span asp-validation-for="Name" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="CategoryId"></label>
+            <select asp-for="CategoryId" asp-items="Model.Categories">
+                <option value="0">Choose a category</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" rows="4" maxlength="2000"></textarea>
+            <span asp-validation-for="Description" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Price"></label>
+            <input asp-for="Price" type="number" step="0.01" min="0" inputmode="decimal" />
+            <span asp-validation-for="Price" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="QuantityAvailable"></label>
+            <input asp-for="QuantityAvailable" type="number" step="1" min="0" inputmode="numeric" />
+            <span asp-validation-for="QuantityAvailable" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Condition"></label>
+            <select asp-for="Condition" asp-items="Model.Conditions"></select>
+            <span asp-validation-for="Condition" class="field-error"></span>
+        </div>
+        <div class="field">
+            <label asp-for="LowStockThreshold"></label>
+            <input asp-for="LowStockThreshold" type="number" step="1" min="0" inputmode="numeric" />
+            <span class="hint">Optional. Leave blank to use the default of 3.</span>
+            <span asp-validation-for="LowStockThreshold" class="field-error"></span>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--block">Save</button>
+            <a class="btn btn--secondary btn--block" asp-area="Seller" asp-controller="Products" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

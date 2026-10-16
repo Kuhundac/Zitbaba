@@ -113,3 +113,12 @@ input[type=text], input[type=email], input[type=tel], input[type=password], inpu
 .alert--success::before { content: "\2713  "; font-weight: 700; }
 .form-actions { display: flex; flex-direction: column; gap: .5rem; }
 select, input[type=number] { min-height: var(--tap); padding: 0 .75rem; border: 1px solid #9CA3AF; border-radius: var(--radius); font: inherit; width: 100%; background: var(--bg); }
+
+/* products-step4 */
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-bottom: 1rem; }
+@media (min-width: 768px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+.stat { border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem; }
+.stat-value { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+.cell-sub { display: block; color: var(--muted); font-size: .875rem; }
+.pager { display: flex; align-items: center; gap: .75rem; margin-top: 1rem; }
+textarea { padding: .5rem .75rem; border: 1px solid #9CA3AF; border-radius: var(--radius); font: inherit; width: 100%; }

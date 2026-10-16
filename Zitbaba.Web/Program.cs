@@ -1,10 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Zitbaba.Web.Data;
 using Zitbaba.Web.Data.Seed;
 using Zitbaba.Web.Infrastructure.Extensions;
 using Zitbaba.Web.Infrastructure.Security;
+
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,3 +95,4 @@ static async Task InitialiseDatabaseAsync(WebApplication app)
 
 // Needed so tests can reference the entry point if they ever use WebApplicationFactory.
 public partial class Program;
+

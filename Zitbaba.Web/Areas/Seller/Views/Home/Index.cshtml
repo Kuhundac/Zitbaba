@@ -1,3 +1,42 @@
-@{ ViewData["Title"] = "Seller dashboard"; }
-<h1>Seller dashboard</h1>
-<p class="muted">Product management arrives on Day 2.</p>
+﻿@model SellerDashboardModel
+@{
+    ViewData["Title"] = "Seller dashboard";
+    var message = TempData["ProductMessage"] as string;
+}
+<div class="page-head">
+    <h1>Seller dashboard</h1>
+    <a class="btn" asp-area="Seller" asp-controller="Products" asp-action="Create">Add product</a>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert--success" role="status">@message</div>
+}
+
+<div class="stat-grid">
+    <div class="stat"><div class="stat-value">@Model.ActiveCount</div><div>Active</div></div>
+    <div class="stat"><div class="stat-value">@Model.DraftCount</div><div>Draft</div></div>
+    <div class="stat"><div class="stat-value">@Model.InactiveCount</div><div>Inactive</div></div>
+    <div class="stat"><div class="stat-value">@Model.PendingModerationCount</div><div>Pending review</div></div>
+</div>
+
+<h2>Low stock</h2>
+@if (Model.LowStockCount == 0)
+{
+    <p class="muted">No products are running low.</p>
+}
+else
+{
+    <p>@Model.LowStockCount product(s) running low:</p>
+    <ul>
+        @foreach (var item in Model.LowStockItems)
+        {
+            <li>
+                <a asp-area="Seller" asp-controller="Products" asp-action="Edit" asp-route-id="@item.ProductId">@item.Name</a>
+                : @item.QuantityAvailable left
+            </li>
+        }
+    </ul>
+}
+
+<p><a asp-area="Seller" asp-controller="Products" asp-action="Index">View all my products</a></p>
