@@ -6,8 +6,12 @@
 }
 <div class="card form-card">
     <h1>@ViewData["Title"]</h1>
+    @if (TempData["ProductError"] is string formError)
+    {
+        <div class="alert alert--error" role="alert">@formError</div>
+    }
     <partial name="_ValidationSummary" />
-    <form asp-area="Seller" asp-controller="Products" asp-action="@formAction" method="post" novalidate>
+    <form asp-area="Seller" asp-controller="Products" asp-action="@formAction" method="post" enctype="multipart/form-data" novalidate>
         <input type="hidden" asp-for="ProductId" />
         <input type="hidden" asp-for="RowVersion" />
 
@@ -50,9 +54,28 @@
             <span asp-validation-for="LowStockThreshold" class="field-error"></span>
         </div>
 
+        <div class="field">
+            <label asp-for="Image">Product image</label>
+            @if (Model.ExistingImageUrl is not null)
+            {
+                <img class="thumb thumb--large" src="@Model.ExistingImageUrl" alt="@Model.Name" />
+            }
+            <input asp-for="Image" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            <span class="hint">One image. JPG, PNG or WebP, up to 5 MB. Choosing a new file replaces the current one.</span>
+            <span asp-validation-for="Image" class="field-error"></span>
+            @if (Model.ExistingImageUrl is not null)
+            {
+                <div class="field--check">
+                    <input asp-for="RemoveImage" />
+                    <label asp-for="RemoveImage"></label>
+                </div>
+            }
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn--block">Save</button>
             <a class="btn btn--secondary btn--block" asp-area="Seller" asp-controller="Products" asp-action="Index">Cancel</a>
         </div>
     </form>
 </div>
+

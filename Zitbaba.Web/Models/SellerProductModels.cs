@@ -58,6 +58,14 @@ public class SellerProductFormModel
     /// <summary>Concurrency token, round-tripped as base64.</summary>
     public string? RowVersion { get; set; }
 
+    public Microsoft.AspNetCore.Http.IFormFile? Image { get; set; }
+
+    [Display(Name = "Remove current image")]
+    public bool RemoveImage { get; set; }
+
+    [BindNever]
+    public string? ExistingImageUrl { get; set; }
+
     [BindNever]
     public List<SelectListItem> Categories { get; set; } = new();
 
@@ -116,3 +124,4 @@ public static class ProductStatusBadges
         _ => new StatusBadgeViewModel(status.ToString())
     };
 }
+

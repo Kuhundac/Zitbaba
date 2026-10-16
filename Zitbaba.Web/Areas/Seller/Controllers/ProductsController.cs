@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Zitbaba.Web.Infrastructure.Extensions;
@@ -12,9 +13,16 @@ namespace Zitbaba.Web.Areas.Seller.Controllers;
 [Authorize(Policy = Policies.RequireApprovedSeller)]
 public class ProductsController : Controller
 {
-    private readonly ISellerProductService _products;
+    private const int MaxRequestBytes = 8 * 1024 * 1024;
 
-    public ProductsController(ISellerProductService products) => _products = products;
+    private readonly ISellerProductService _products;
+    private readonly IProductImageService _images;
+
+    public ProductsController(ISellerProductService products, IProductImageService images)
+    {
+        _products = products;
+        _images = images;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1) =>
@@ -28,14 +36,28 @@ public class ProductsController : Controller
         return View("Form", model);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(MaxRequestBytes)]
     public async Task<IActionResult> Create(SellerProductFormModel model)
     {
+        var upload = await ReadUploadAsync(model.Image);
+        await CheckImageAsync(upload);
+
         if (ModelState.IsValid)
         {
-            var result = await _products.CreateAsync(User.GetUserId(), ToInput(model));
+            var userId = User.GetUserId();
+            var result = await _products.CreateAsync(userId, ToInput(model));
             if (result.Succeeded)
             {
+                if (upload is not null)
+                {
+                    var image = await _images.SetImageAsync(userId, result.ProductId!.Value, upload);
+                    if (!image.Succeeded)
+                    {
+                        TempData["ProductError"] = "The product was created, but the image could not be saved: " + image.Error;
+                        return RedirectToAction(nameof(Edit), new { id = result.ProductId });
+                    }
+                }
+
                 TempData["ProductMessage"] = $"Product '{model.Name.Trim()}' created.";
                 return RedirectToAction(nameof(Index));
             }
@@ -55,15 +77,32 @@ public class ProductsController : Controller
         return View("Form", model);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(MaxRequestBytes)]
     public async Task<IActionResult> Edit(SellerProductFormModel model)
     {
+        var upload = await ReadUploadAsync(model.Image);
+        await CheckImageAsync(upload);
+
         if (ModelState.IsValid)
         {
-            var result = await _products.UpdateAsync(User.GetUserId(), model.ProductId, ToInput(model), model.RowVersion);
+            var userId = User.GetUserId();
+            var result = await _products.UpdateAsync(userId, model.ProductId, ToInput(model), model.RowVersion);
             if (result.Outcome == ProductOutcome.NotFound) return NotFound();
+
             if (result.Succeeded)
             {
+                ProductResult? image = null;
+                if (upload is not null)
+                    image = await _images.SetImageAsync(userId, model.ProductId, upload);
+                else if (model.RemoveImage)
+                    image = await _images.RemoveImageAsync(userId, model.ProductId);
+
+                if (image is { Succeeded: false })
+                {
+                    TempData["ProductError"] = "The product was saved, but the image could not be updated: " + image.Error;
+                    return RedirectToAction(nameof(Edit), new { id = model.ProductId });
+                }
+
                 TempData["ProductMessage"] = $"Product '{model.Name.Trim()}' saved.";
                 return RedirectToAction(nameof(Index));
             }
@@ -93,12 +132,34 @@ public class ProductsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    private async Task CheckImageAsync(ImageUpload? upload)
+    {
+        if (upload is null) return;
+        var check = await _images.ValidateAsync(upload);
+        if (!check.Ok)
+            ModelState.AddModelError(nameof(SellerProductFormModel.Image), check.Error!);
+    }
+
+    private static async Task<ImageUpload?> ReadUploadAsync(IFormFile? file)
+    {
+        // A file input left empty arrives as null (or an unnamed, zero-length part).
+        if (file is null || (file.Length == 0 && string.IsNullOrEmpty(file.FileName))) return null;
+
+        var buffer = new MemoryStream();
+        await file.CopyToAsync(buffer);
+        buffer.Position = 0;
+        return new ImageUpload(file.FileName, buffer.Length, buffer);
+    }
+
     private async Task FillOptionsAsync(SellerProductFormModel model)
     {
         var options = await _products.GetCategoryOptionsAsync(model.CategoryId == 0 ? null : model.CategoryId);
         model.Categories = options
             .Select(o => new SelectListItem(o.IsActive ? o.Name : o.Name + " (inactive)", o.Id.ToString()))
             .ToList();
+
+        if (model.ProductId != Guid.Empty)
+            model.ExistingImageUrl = await _images.GetImageUrlAsync(User.GetUserId(), model.ProductId);
     }
 
     private static SellerProductInput ToInput(SellerProductFormModel m) =>

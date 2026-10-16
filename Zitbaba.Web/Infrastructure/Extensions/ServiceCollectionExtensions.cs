@@ -102,9 +102,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISellerProductService, SellerProductService>();
+        services.AddSingleton<IImageStorage, LocalImageStorage>();
+        services.AddScoped<IProductImageService, ProductImageService>();
         return services;
     }
 }
+
 
 
 

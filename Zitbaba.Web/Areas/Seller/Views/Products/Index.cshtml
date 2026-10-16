@@ -41,8 +41,10 @@ else
                 @foreach (var row in Model.Items)
                 {
                     var statusBadge = ProductStatusBadges.For(row.Status);
+                    var imgSrc = row.ThumbnailUrl ?? "/img/placeholder.svg";
+                    var imgAlt = row.ThumbnailUrl is null ? "No image" : row.Name;
                     <tr>
-                        <td>@row.Name<span class="cell-sub">@row.CategoryName</span></td>
+                        <td><div class="product-cell"><img class="thumb" src="@imgSrc" alt="@imgAlt" width="48" height="48" loading="lazy" /><div>@row.Name<span class="cell-sub">@row.CategoryName</span></div></div></td>
                         <td>@MoneyFormatter.Zmw(row.Price)</td>
                         <td>
                             @row.QuantityAvailable
@@ -102,3 +104,4 @@ else
         </nav>
     }
 }
+
