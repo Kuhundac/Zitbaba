@@ -97,3 +97,26 @@ CI (`.github/workflows/ci.yml`) restores, builds and tests on every push and pul
 **Running tests:** stop the site first (`Ctrl+C`), otherwise the build fails with a file-lock error. Then `dotnet test Zitbaba.sln`.
 
 **Audit log:** every approval, category change, product change, image change and denied access writes a row to `AuditLogs`.
+
+## Day 3 notes (public catalogue)
+
+Public pages: home (`/`), `/Home/Categories`, `/Home/Search`, `/Product/{id}`, `/Store/{id}`.
+`/Wishlist` needs a login.
+
+- **One visibility rule** lives in `CatalogueService`: a product is public only if its status is
+  Active and its seller is Approved. Out-of-stock products stay listed and are marked.
+  Draft, Pending moderation, Inactive, Removed and Blocked products never appear, and neither do
+  products of Pending, Rejected or Suspended sellers. Public pages never show phone numbers,
+  room numbers or application notes.
+- **Search** matches name or description (every word must match), with category (including
+  subcategories), price, condition and in-stock filters, three sort orders, 12 per page.
+- **Wishlist** uses the `WishlistItems` table (migration `AddDay3Changes`), unique per user and
+  product. Saved products that stop being public are hidden from the list and come back if
+  they are reactivated.
+- **No view or save counters yet.** `Product.ViewCount` and `Product.SaveCount` are not
+  incremented, because changing the product row would change `RowVersion` and make sellers
+  see "changed somewhere else" while editing. A separate counter table would fix this.
+- After `git pull`, Development applies new migrations when the site starts. Production never
+  does; run migrations deliberately.
+- Tests: `dotnet test Zitbaba.sln` (78 passing at the end of Day 3). Stop the site first or the
+  build hits a file lock.
