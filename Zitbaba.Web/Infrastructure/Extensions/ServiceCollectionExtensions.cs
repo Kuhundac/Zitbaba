@@ -104,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProductDetailService, ProductDetailService>();
         services.AddScoped<IStorefrontService, StorefrontService>();
         services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<ICartService, CartService>();
         services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ICategoryService, CategoryService>();
@@ -113,6 +114,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
 
 
 
