@@ -1,0 +1,26 @@
+﻿@model IReadOnlyList<Zitbaba.Web.Services.CatalogueCategory>
+@{
+    ViewData["Title"] = "Categories";
+}
+<h1>Categories</h1>
+
+@if (Model.Count == 0)
+{
+    <p class="muted">No categories yet.</p>
+}
+
+@foreach (var parent in Model)
+{
+    <section class="list-card">
+        <h2><a asp-controller="Home" asp-action="Search" asp-route-categoryId="@parent.CategoryId">@parent.Name</a></h2>
+        @if (parent.Children.Count > 0)
+        {
+            <ul class="chips">
+                @foreach (var child in parent.Children)
+                {
+                    <li><a class="chip" asp-controller="Home" asp-action="Search" asp-route-categoryId="@child.CategoryId">@child.Name</a></li>
+                }
+            </ul>
+        }
+    </section>
+}

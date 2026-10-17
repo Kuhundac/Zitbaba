@@ -1,0 +1,24 @@
+﻿@model CatalogueItem
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Infrastructure.Extensions
+@using Zitbaba.Web.Services
+@{
+    var imageSrc = string.IsNullOrWhiteSpace(Model.ImageUrl)
+        ? Url.Content("~/img/placeholder.svg")
+        : Model.ImageUrl;
+    var conditionText = Model.Condition == ProductCondition.LikeNew ? "Like new" : Model.Condition.ToString();
+    var stockBadge = Model.Stock switch
+    {
+        CatalogueStock.OutOfStock => new StatusBadgeViewModel("Out of stock", BadgeKind.Warning),
+        CatalogueStock.LowStock => new StatusBadgeViewModel("Few left", BadgeKind.Info),
+        _ => new StatusBadgeViewModel("In stock", BadgeKind.Success)
+    };
+}
+<article class="card product-card">
+    <img src="@imageSrc" alt="@Model.Name" loading="lazy" />
+    <h3>@Model.Name</h3>
+    <p class="price">@MoneyFormatter.Zmw(Model.Price)</p>
+    <p class="muted">@conditionText &middot; @Model.CategoryName</p>
+    <p class="muted">Sold by @Model.StoreName</p>
+    <p><partial name="_StatusBadge" model="stockBadge" /></p>
+</article>

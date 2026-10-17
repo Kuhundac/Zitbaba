@@ -1,10 +1,7 @@
+﻿@model HomeIndexModel
+@using Zitbaba.Web.Services
 @{
     ViewData["Title"] = "Home";
-    var categories = new[]
-    {
-        "Fashion", "Electronics", "Food and Snacks", "Books and Stationery",
-        "Beauty and Personal Care", "Home and Hostel", "Services", "Other"
-    };
 }
 <section class="hero">
     <h1>Buy and sell on campus</h1>
@@ -18,15 +15,35 @@
 
 <section aria-labelledby="cats-heading">
     <h2 id="cats-heading">Browse categories</h2>
-    <ul class="chips">
-        @foreach (var c in categories)
-        {
-            <li><a class="chip" asp-controller="Home" asp-action="Categories">@c</a></li>
-        }
-    </ul>
+    @if (Model.Categories.Count == 0)
+    {
+        <p class="muted">No categories yet.</p>
+    }
+    else
+    {
+        <ul class="chips">
+            @foreach (var c in Model.Categories)
+            {
+                <li><a class="chip" asp-controller="Home" asp-action="Search" asp-route-categoryId="@c.CategoryId">@c.Name</a></li>
+            }
+        </ul>
+    }
+    <p><a asp-controller="Home" asp-action="Categories">See all categories</a></p>
 </section>
 
 <section aria-labelledby="recent-heading">
     <h2 id="recent-heading">Recently added</h2>
-    <p class="muted">Products will appear here once sellers start listing (coming on Days 2–3).</p>
+    @if (Model.Recent.Count == 0)
+    {
+        <p class="muted">No products yet. Check back soon.</p>
+    }
+    else
+    {
+        <ul class="product-grid">
+            @foreach (var item in Model.Recent)
+            {
+                <li><partial name="_ProductCard" model="item" /></li>
+            }
+        </ul>
+    }
 </section>
