@@ -1,0 +1,72 @@
+﻿@model CatalogueProductDetail
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Infrastructure.Extensions
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = Model.Name;
+    var conditionText = Model.Condition == ProductCondition.LikeNew ? "Like new" : Model.Condition.ToString();
+    var stockBadge = Model.Stock switch
+    {
+        CatalogueStock.OutOfStock => new StatusBadgeViewModel("Out of stock", BadgeKind.Warning),
+        CatalogueStock.LowStock => new StatusBadgeViewModel("Few left", BadgeKind.Info),
+        _ => new StatusBadgeViewModel("In stock", BadgeKind.Success)
+    };
+    var mainImage = Model.ImageUrls.Count > 0 ? Model.ImageUrls[0] : Url.Content("~/img/placeholder.svg");
+    var seller = Model.Seller;
+}
+
+<p><a asp-controller="Home" asp-action="Search">Back to search</a></p>
+
+<div class="product-detail">
+    <div>
+        <img class="detail-image" src="@mainImage" alt="@Model.Name" />
+    </div>
+
+    <div>
+        <h1>@Model.Name</h1>
+        <p class="price">@MoneyFormatter.Zmw(Model.Price)</p>
+        <p><partial name="_StatusBadge" model="stockBadge" /></p>
+
+        @if (Model.Stock == CatalogueStock.OutOfStock)
+        {
+            <p>This product is currently out of stock.</p>
+        }
+        else if (Model.Stock == CatalogueStock.LowStock)
+        {
+            <p>Only @Model.QuantityAvailable left.</p>
+        }
+
+        <p class="muted">
+            @conditionText &middot;
+            @if (Model.ParentCategoryName is not null)
+            {
+                <span>@Model.ParentCategoryName &gt; </span>
+            }
+            <a asp-controller="Home" asp-action="Search" asp-route-categoryId="@Model.CategoryId">@Model.CategoryName</a>
+        </p>
+
+        <h2>Description</h2>
+        @if (string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="muted">The seller has not added a description.</p>
+        }
+        else
+        {
+            <p class="pre-line">@Model.Description</p>
+        }
+
+        <section class="card seller-card" aria-labelledby="seller-heading">
+            <h2 id="seller-heading">Seller</h2>
+            <p><strong>@seller.StoreName</strong></p>
+            @if (seller.RatingAverage is decimal average)
+            {
+                <p>Rated @average.ToString("0.0") out of 5 (@seller.RatingCount @(seller.RatingCount == 1 ? "rating" : "ratings"))</p>
+            }
+            else
+            {
+                <p class="muted">No ratings yet.</p>
+            }
+            <p class="muted">On Zitbaba since @seller.MemberSince.ToString("MMM yyyy")</p>
+        </section>
+    </div>
+</div>

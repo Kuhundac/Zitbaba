@@ -15,8 +15,10 @@
     };
 }
 <article class="card product-card">
-    <img src="@imageSrc" alt="@Model.Name" loading="lazy" />
-    <h3>@Model.Name</h3>
+    <a asp-controller="Product" asp-action="Details" asp-route-id="@Model.ProductId" tabindex="-1" aria-hidden="true">
+        <img src="@imageSrc" alt="" loading="lazy" />
+    </a>
+    <h3><a asp-controller="Product" asp-action="Details" asp-route-id="@Model.ProductId">@Model.Name</a></h3>
     <p class="price">@MoneyFormatter.Zmw(Model.Price)</p>
     <p class="muted">@conditionText &middot; @Model.CategoryName</p>
     <p class="muted">Sold by @Model.StoreName</p>

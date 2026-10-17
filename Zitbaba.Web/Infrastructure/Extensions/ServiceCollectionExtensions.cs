@@ -101,6 +101,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAccountMenuService, AccountMenuService>();
         services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         services.AddScoped<ICatalogueService, CatalogueService>();
+        services.AddScoped<IProductDetailService, ProductDetailService>();
         services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<ICategoryService, CategoryService>();
@@ -110,6 +111,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
 
 
 
