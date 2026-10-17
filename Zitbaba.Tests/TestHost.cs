@@ -37,6 +37,8 @@ internal sealed class TestHost : IDisposable
         services.AddScoped<ISellerProductService, SellerProductService>();
         services.AddSingleton<IImageStorage, InMemoryImageStorage>();
         services.AddScoped<IProductImageService, ProductImageService>();
+        services.AddScoped<IAccountMenuService, AccountMenuService>();
+        services.AddScoped<IAdminDashboardService, AdminDashboardService>();
         _provider = services.BuildServiceProvider();
     }
 
@@ -52,4 +54,5 @@ internal sealed class TestHost : IDisposable
 
     public void Dispose() => _provider.Dispose();
 }
+
 

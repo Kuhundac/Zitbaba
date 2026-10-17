@@ -1,7 +1,8 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Zitbaba.Web.Domain.Enums;
+using Zitbaba.Web.Infrastructure.Security;
 using Zitbaba.Web.Models;
 using Zitbaba.Web.Services;
 
@@ -18,6 +19,8 @@ public class SellerApplicationController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
+        // Admins manage sellers; they do not apply to become one.
+        if (User.IsInRole(RoleNames.Admin)) return Forbid();
         if (!TryGetUserId(out var userId)) return Challenge();
 
         var info = await _applications.GetStatusAsync(userId);
@@ -40,6 +43,7 @@ public class SellerApplicationController : Controller
     public async Task<IActionResult> Index(
         [Bind(Prefix = nameof(SellerApplicationPageModel.Form))] SellerApplicationFormModel form)
     {
+        if (User.IsInRole(RoleNames.Admin)) return Forbid();
         if (!TryGetUserId(out var userId)) return Challenge();
 
         if (!ModelState.IsValid)
