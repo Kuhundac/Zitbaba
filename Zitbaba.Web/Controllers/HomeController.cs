@@ -49,6 +49,13 @@ public class HomeController : Controller
     public IActionResult Wishlist() => RedirectToAction("Index", "Wishlist");
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult HttpStatus(int code)
+    {
+        if (code == 404) return View("NotFound");
+        return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() =>
         View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 
@@ -58,4 +65,5 @@ public class HomeController : Controller
         return View("ComingSoon");
     }
 }
+
 

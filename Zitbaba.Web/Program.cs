@@ -42,7 +42,7 @@ else
     app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/Home/Error");
+app.UseStatusCodePagesWithReExecute("/Home/HttpStatus", "?code={0}");
 
 app.UseHttpsRedirection();
 app.UseMiddleware<SecurityHeadersMiddleware>();
@@ -95,4 +95,5 @@ static async Task InitialiseDatabaseAsync(WebApplication app)
 
 // Needed so tests can reference the entry point if they ever use WebApplicationFactory.
 public partial class Program;
+
 
