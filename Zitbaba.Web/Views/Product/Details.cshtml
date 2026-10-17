@@ -57,7 +57,7 @@
 
         <section class="card seller-card" aria-labelledby="seller-heading">
             <h2 id="seller-heading">Seller</h2>
-            <p><strong>@seller.StoreName</strong></p>
+            <p><strong><a asp-controller="Store" asp-action="Index" asp-route-id="@seller.SellerProfileId">@seller.StoreName</a></strong></p>
             @if (seller.RatingAverage is decimal average)
             {
                 <p>Rated @average.ToString("0.0") out of 5 (@seller.RatingCount @(seller.RatingCount == 1 ? "rating" : "ratings"))</p>
@@ -70,3 +70,4 @@
         </section>
     </div>
 </div>
+

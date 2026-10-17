@@ -1,0 +1,61 @@
+﻿@model StorefrontModel
+@using Zitbaba.Web.Services
+@{
+    var seller = Model.Seller;
+    var result = Model.Products;
+    ViewData["Title"] = seller.StoreName;
+    string? PageUrl(int p) => Url.Action("Index", "Store", new { id = seller.SellerProfileId, page = p });
+}
+
+<p><a asp-controller="Home" asp-action="Search">Back to search</a></p>
+
+<section class="card" aria-labelledby="store-heading">
+    <h1 id="store-heading">@seller.StoreName</h1>
+    @if (seller.RatingAverage is decimal average)
+    {
+        <p>Rated @average.ToString("0.0") out of 5 (@seller.RatingCount @(seller.RatingCount == 1 ? "rating" : "ratings"))</p>
+    }
+    else
+    {
+        <p class="muted">No ratings yet.</p>
+    }
+    <p class="muted">On Zitbaba since @seller.MemberSince.ToString("MMM yyyy")</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <p class="pre-line">@Model.Description</p>
+    }
+</section>
+
+<h2>Products</h2>
+<p class="result-count" role="status">
+    @(result.TotalCount == 1 ? "1 product" : result.TotalCount + " products")
+</p>
+
+@if (result.Items.Count == 0)
+{
+    <p>This store has no products for sale right now.</p>
+}
+else
+{
+    <ul class="product-grid">
+        @foreach (var item in result.Items)
+        {
+            <li><partial name="_ProductCard" model="item" /></li>
+        }
+    </ul>
+}
+
+@if (result.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (result.HasPrevious)
+        {
+            <a href="@PageUrl(result.Page - 1)">Previous</a>
+        }
+        <span>Page @result.Page of @result.TotalPages</span>
+        @if (result.HasNext)
+        {
+            <a href="@PageUrl(result.Page + 1)">Next</a>
+        }
+    </nav>
+}

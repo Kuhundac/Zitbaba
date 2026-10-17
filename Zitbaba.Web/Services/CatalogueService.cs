@@ -27,7 +27,8 @@ public record CatalogueQuery(
     ProductCondition? Condition = null,
     bool InStockOnly = false,
     CatalogueSort Sort = CatalogueSort.Newest,
-    int Page = 1);
+    int Page = 1,
+    Guid? SellerId = null);
 
 // Public view of a product. No phone number, room number or other private seller data.
 public record CatalogueItem(
@@ -78,6 +79,9 @@ public class CatalogueService : ICatalogueService
                 p.Name.ToLower().Contains(t)
                 || (p.Description != null && p.Description.ToLower().Contains(t)));
         }
+
+        if (query.SellerId is Guid sellerId)
+            q = q.Where(p => p.SellerProfileId == sellerId);
 
         if (query.CategoryId is int categoryId)
             q = q.Where(p => p.CategoryId == categoryId || p.Category!.ParentCategoryId == categoryId);
@@ -185,3 +189,4 @@ public class CatalogueService : ICatalogueService
     private static decimal? NonNegative(decimal? value) =>
         value is decimal d && d >= 0m ? d : null;
 }
+
