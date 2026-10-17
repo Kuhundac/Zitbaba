@@ -46,7 +46,7 @@ public class HomeController : Controller
     }
 
     // Placeholder until Day 3 step 6.
-    public IActionResult Wishlist() => ComingSoon("Wishlist");
+    public IActionResult Wishlist() => RedirectToAction("Index", "Wishlist");
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error() =>
@@ -58,3 +58,4 @@ public class HomeController : Controller
         return View("ComingSoon");
     }
 }
+

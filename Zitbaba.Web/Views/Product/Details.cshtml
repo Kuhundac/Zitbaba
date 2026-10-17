@@ -45,6 +45,30 @@
             <a asp-controller="Home" asp-action="Search" asp-route-categoryId="@Model.CategoryId">@Model.CategoryName</a>
         </p>
 
+        @if (TempData["Message"] is string wishlistMessage)
+        {
+            <p role="status">@wishlistMessage</p>
+        }
+        @if (TempData["Error"] is string wishlistError)
+        {
+            <p role="alert" class="field-error">@wishlistError</p>
+        }
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            var isSaved = ViewData["IsSaved"] as bool? == true;
+            var wishlistAction = isSaved ? "Remove" : "Add";
+            var wishlistLabel = isSaved ? "Remove from wishlist" : "Save to wishlist";
+            <form asp-controller="Wishlist" asp-action="@wishlistAction" method="post" class="action-form">
+                <input type="hidden" name="productId" value="@Model.ProductId" />
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                <button type="submit" class="btn btn--secondary">@wishlistLabel</button>
+            </form>
+        }
+        else
+        {
+            <p><a asp-controller="Account" asp-action="Login">Log in to save this product</a></p>
+        }
+
         <h2>Description</h2>
         @if (string.IsNullOrWhiteSpace(Model.Description))
         {
@@ -70,4 +94,5 @@
         </section>
     </div>
 </div>
+
 

@@ -1,0 +1,56 @@
+﻿@model Zitbaba.Web.Services.PagedResult<Zitbaba.Web.Services.CatalogueItem>
+@{
+    ViewData["Title"] = "Wishlist";
+    string? PageUrl(int p) => Url.Action("Index", "Wishlist", new { page = p });
+}
+
+<h1>Wishlist</h1>
+
+@if (TempData["Message"] is string message)
+{
+    <p role="status">@message</p>
+}
+@if (TempData["Error"] is string error)
+{
+    <p role="alert" class="field-error">@error</p>
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p>Your wishlist is empty. Save products you like and they will appear here.</p>
+    <p><a class="btn" asp-controller="Home" asp-action="Search">Browse products</a></p>
+}
+else
+{
+    <p class="result-count" role="status">
+        @(Model.TotalCount == 1 ? "1 saved product" : Model.TotalCount + " saved products")
+    </p>
+    <ul class="product-grid">
+        @foreach (var item in Model.Items)
+        {
+            <li>
+                <partial name="_ProductCard" model="item" />
+                <form asp-controller="Wishlist" asp-action="Remove" method="post">
+                    <input type="hidden" name="productId" value="@item.ProductId" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="btn btn--secondary">Remove from wishlist</button>
+                </form>
+            </li>
+        }
+    </ul>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (Model.HasPrevious)
+        {
+            <a href="@PageUrl(Model.Page - 1)">Previous</a>
+        }
+        <span>Page @Model.Page of @Model.TotalPages</span>
+        @if (Model.HasNext)
+        {
+            <a href="@PageUrl(Model.Page + 1)">Next</a>
+        }
+    </nav>
+}

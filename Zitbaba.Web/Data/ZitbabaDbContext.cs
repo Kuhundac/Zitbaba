@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Zitbaba.Web.Domain.Entities;
@@ -16,6 +16,7 @@ public class ZitbabaDbContext : IdentityDbContext<ApplicationUser, IdentityRole<
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -24,3 +25,4 @@ public class ZitbabaDbContext : IdentityDbContext<ApplicationUser, IdentityRole<
         builder.ApplyConfigurationsFromAssembly(typeof(ZitbabaDbContext).Assembly);
     }
 }
+
