@@ -80,3 +80,20 @@ Buyer, Seller, Admin, Support, DeliveryAgent. Self-registration grants **Buyer o
 5. Check `/health`, then log in as the admin.
 
 CI (`.github/workflows/ci.yml`) restores, builds and tests on every push and pull request.
+
+## Day 2 notes
+
+**What exists:** seller applications, admin approve/reject/suspend/reinstate, admin categories, seller dashboard and products (one image each), account menu by seller status, audit log.
+
+**Local database:** the dev database runs in Docker, not LocalDB.
+- After a PC restart: `docker start zitbaba-sql`
+- Connection string, `Seed:AdminEmail` and `Seed:AdminPassword` live in `dotnet user-secrets` (run secrets commands from the solution folder).
+- Seeded admin: `admin@zitbaba.local`.
+
+**Uploads:** product images are saved to `Zitbaba.Web/wwwroot/uploads/products` (git-ignored). This is development storage only. Production needs persistent storage (for example cloud blob storage) because app folders can be wiped on deploy. Images are limited to .jpg, .jpeg, .png, .webp at 5 MB or less, checked by file signature. EXIF metadata is not stripped yet.
+
+**Listing moderation:** `Marketplace:RequireListingModeration` in `appsettings.json` (default `false`). If `true`, new products start as Pending review, but there is no admin approval page yet.
+
+**Running tests:** stop the site first (`Ctrl+C`), otherwise the build fails with a file-lock error. Then `dotnet test Zitbaba.sln`.
+
+**Audit log:** every approval, category change, product change, image change and denied access writes a row to `AuditLogs`.
