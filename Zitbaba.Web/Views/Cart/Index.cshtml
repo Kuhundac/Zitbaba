@@ -1,0 +1,91 @@
+﻿@model Zitbaba.Web.Services.CartView
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "Your cart";
+    var placeholder = Url.Content("~/img/placeholder.svg");
+}
+
+<h1>Your cart</h1>
+
+@if (TempData["Message"] is string cartMessage)
+{
+    <p role="status">@cartMessage</p>
+}
+@if (TempData["Error"] is string cartError)
+{
+    <p role="alert" class="field-error">@cartError</p>
+}
+
+@if (Model.IsEmpty)
+{
+    <p>Your cart is empty. Find something you like and add it here.</p>
+    <p><a class="btn" asp-controller="Home" asp-action="Search">Browse products</a></p>
+}
+else
+{
+    <p class="muted">
+        Items from <strong>@Model.StoreName</strong>. You can buy from one seller at a time.
+        Payment is cash when you collect your order.
+    </p>
+
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                    <th scope="col"><span class="visually-hidden">Remove</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Model.Lines)
+                {
+                    var img = string.IsNullOrWhiteSpace(line.ImageUrl) ? placeholder : line.ImageUrl;
+                    <tr>
+                        <td>
+                            <img class="thumb" src="@img" alt="" />
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@line.ProductId">@line.Name</a>
+                            @if (line.Problem is not null)
+                            {
+                                <p class="field-error" role="alert">@line.Problem</p>
+                            }
+                        </td>
+                        <td>@MoneyFormatter.Zmw(line.UnitPrice)</td>
+                        <td>
+                            <form asp-controller="Cart" asp-action="SetQuantity" method="post" class="action-form cart-form">
+                                <input type="hidden" name="productId" value="@line.ProductId" />
+                                <input type="number" name="quantity" value="@line.Quantity" min="0" max="99" class="qty-input" aria-label="Quantity for @line.Name" />
+                                <button type="submit" class="btn btn--secondary">Update</button>
+                            </form>
+                        </td>
+                        <td>@MoneyFormatter.Zmw(line.LineTotal)</td>
+                        <td>
+                            <form asp-controller="Cart" asp-action="Remove" method="post" class="action-form">
+                                <input type="hidden" name="productId" value="@line.ProductId" />
+                                <button type="submit" class="btn btn--secondary">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="cart-summary">
+        <p class="cart-total">Total: @MoneyFormatter.Zmw(Model.Total)</p>
+        <div class="cart-actions">
+            <form asp-controller="Cart" asp-action="Clear" method="post" class="action-form">
+                <button type="submit" class="btn btn--secondary">Clear cart</button>
+            </form>
+            <button type="button" class="btn" disabled>Checkout</button>
+        </div>
+    </div>
+
+    @if (Model.HasProblems)
+    {
+        <p class="hint">Fix the items marked above before you can check out.</p>
+    }
+    <p><a asp-controller="Home" asp-action="Search">Continue shopping</a></p>
+}

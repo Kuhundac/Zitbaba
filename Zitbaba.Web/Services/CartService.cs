@@ -99,7 +99,6 @@ public class CartService : ICartService
             var currentStore = await _db.SellerProfiles.AsNoTracking()
                 .Where(s => s.SellerProfileId == cart.SellerProfileId)
                 .Select(s => s.StoreName).FirstOrDefaultAsync() ?? "another seller";
-            _db.Entry(cart).State = cart.CartId == Guid.Empty ? EntityState.Detached : _db.Entry(cart).State;
             return new CartResult(CartOutcome.DifferentSeller,
                 $"Your cart already has items from {currentStore}. You can buy from one seller at a time.",
                 currentStore);
@@ -249,3 +248,4 @@ public class CartService : ICartService
     private sealed record VisibleProduct(
         Guid ProductId, string Name, Guid SellerProfileId, Guid SellerUserId, int QuantityAvailable);
 }
+

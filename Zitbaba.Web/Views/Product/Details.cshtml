@@ -69,6 +69,35 @@
             <p><a asp-controller="Account" asp-action="Login">Log in to save this product</a></p>
         }
 
+        @if (Model.Stock != CatalogueStock.OutOfStock)
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var maxQty = Math.Min(Model.QuantityAvailable, 99);
+                <form asp-controller="Cart" asp-action="Add" method="post" class="action-form cart-form">
+                    <input type="hidden" name="productId" value="@Model.ProductId" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <label for="cart-qty">Quantity</label>
+                    <input id="cart-qty" type="number" name="quantity" value="1" min="1" max="@maxQty" class="qty-input" />
+                    <button type="submit" class="btn">Add to cart</button>
+                </form>
+            }
+            else
+            {
+                <p><a asp-controller="Account" asp-action="Login">Log in to add this product to your cart</a></p>
+            }
+        }
+        @if (TempData["CartConflictProductId"] is string cartConflictId && cartConflictId == Model.ProductId.ToString())
+        {
+            var cartConflictQty = TempData["CartConflictQuantity"] as string ?? "1";
+            <form asp-controller="Cart" asp-action="ReplaceAndAdd" method="post" class="action-form">
+                <input type="hidden" name="productId" value="@Model.ProductId" />
+                <input type="hidden" name="quantity" value="@cartConflictQty" />
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                <button type="submit" class="btn btn--secondary">Clear cart and add this item</button>
+            </form>
+        }
+
         <h2>Description</h2>
         @if (string.IsNullOrWhiteSpace(Model.Description))
         {
@@ -94,5 +123,6 @@
         </section>
     </div>
 </div>
+
 
 
