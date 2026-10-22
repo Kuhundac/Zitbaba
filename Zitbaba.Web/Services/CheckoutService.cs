@@ -80,7 +80,11 @@ public class CheckoutService : ICheckoutService
 
         var cart = await _db.Carts.Include(c => c.Items).FirstOrDefaultAsync(c => c.UserId == userId);
         if (cart is null || cart.Items.Count == 0 || cart.SellerProfileId is null)
-            return new CheckoutResult(CheckoutOutcome.EmptyCart, "Your cart is empty.");
+        {
+            // A twin request (double click) may have just placed this order and emptied the cart.
+            var done = await FindExistingAsync(userId, submissionKey);
+            return done ?? new CheckoutResult(CheckoutOutcome.EmptyCart, "Your cart is empty.");
+        }
 
         var sellerId = cart.SellerProfileId.Value;
         var seller = await _db.SellerProfiles.AsNoTracking()
@@ -273,3 +277,4 @@ public class CheckoutService : ICheckoutService
         return $"ZB-{DateTime.UtcNow:yyyyMMdd}-{new string(chars)}";
     }
 }
+
