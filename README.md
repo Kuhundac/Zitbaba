@@ -120,3 +120,46 @@ Public pages: home (`/`), `/Home/Categories`, `/Home/Search`, `/Product/{id}`, `
   does; run migrations deliberately.
 - Tests: `dotnet test Zitbaba.sln` (78 passing at the end of Day 3). Stop the site first or the
   build hits a file lock.
+
+## Day 4 notes (cart and checkout)
+
+**What exists:** cart, checkout (cash on pickup), order confirmation, "My orders" (`/Orders`, `/Orders/{id}`).
+Migration `AddDay4Changes` adds `Carts`, `CartItems`, `Orders`, `OrderItems` and `OrderStatusHistory`.
+
+**Cart rules** (`CartService`):
+- One seller per cart. Adding from a second seller is refused with a message and a
+  "Clear cart and add this item" button. Nothing is replaced silently.
+- Only public products (Active, seller Approved) and only within stock. Sellers cannot add their own products.
+- The cart does NOT reserve stock. The cart page shows current prices and marks lines that became
+  unavailable or short; checkout stays disabled until they are fixed.
+
+**Checkout rules** (`CheckoutService`):
+- One database transaction. Each line runs a single SQL statement that subtracts stock only if enough is
+  left (`QuantityAvailable >= n`), so two buyers can never both take the last unit. Any line that fails
+  rolls everything back and names the item that ran short.
+- Prices are read after the stock update, then compared with the total the buyer saw. If they differ the
+  order is refused and rolled back.
+- Order items store a snapshot of the product name and unit price.
+- A one-time key on the checkout form plus a unique index on buyer + key means a double click or the Back
+  button returns the same order instead of creating another.
+- Order number format: `ZB-yyyyMMdd-XXXXXX`. Status starts at Pending, payment at Pending (cash on pickup).
+  The first `OrderStatusHistory` row and an `OrderPlaced` audit row are written in the same transaction.
+- Taking stock changes the product's `RowVersion`, so a seller saving an edit at that exact moment sees the
+  friendly "changed somewhere else" message. This is expected.
+- Order status changes (accept, reject, ready, complete, cancel and stock restore) arrive on Day 5.
+
+**Tests:** `dotnet test Zitbaba.sln` (stop the site first). The normal suite uses an in-memory database.
+Six extra tests run against real SQL Server (atomic stock under concurrent buyers, rollback, double submit,
+unique index, check constraints). They only run when `ZITBABA_TEST_SQL` is set; otherwise they are reported
+as skipped, which is what CI shows for now. To run them (Docker SQL Server must be running):
+
+    $cs = (dotnet user-secrets --project Zitbaba.Web list | Select-String "ConnectionStrings:DefaultConnection").ToString()
+    $pw = [regex]::Match($cs, 'Password=([^;]+)').Groups[1].Value
+    $env:ZITBABA_TEST_SQL = "Server=localhost,14333;Database=Zitbaba_Test;User Id=sa;Password=$pw;TrustServerCertificate=True;MultipleActiveResultSets=true"
+    dotnet test Zitbaba.sln
+
+The first run creates the `Zitbaba_Test` database and applies the migrations. Never point this variable at
+`Zitbaba_Dev` or a real database. Running these tests in CI is planned for Day 7.
+
+**Service registration test:** every controller, view component and service that needs an app service must
+have it registered in `AddZitbabaServices`; `ServiceRegistrationTests` fails with the missing names if not.
