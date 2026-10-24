@@ -9,8 +9,13 @@ namespace Zitbaba.Web.Controllers;
 public class OrdersController : Controller
 {
     private readonly IBuyerOrderService _orders;
+    private readonly IOrderTransitionService _transitions;
 
-    public OrdersController(IBuyerOrderService orders) => _orders = orders;
+    public OrdersController(IBuyerOrderService orders, IOrderTransitionService transitions)
+    {
+        _orders = orders;
+        _transitions = transitions;
+    }
 
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1)
@@ -27,6 +32,18 @@ public class OrdersController : Controller
         var order = await _orders.GetAsync(userId, id);
         if (order is null) return NotFound();
         return View(order);
+    }
+
+    [HttpPost("Orders/{id:guid}/Cancel"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cancel(Guid id, string? reason)
+    {
+        if (!TryGetUserId(out var userId)) return Challenge();
+
+        var result = await _transitions.BuyerCancelAsync(userId, id, reason);
+        if (result.Outcome == TransitionOutcome.NotFound) return NotFound();
+
+        TempData[result.Succeeded ? "OrderMessage" : "OrderError"] = result.Message;
+        return RedirectToAction(nameof(Details), new { id });
     }
 
     private bool TryGetUserId(out Guid userId) =>

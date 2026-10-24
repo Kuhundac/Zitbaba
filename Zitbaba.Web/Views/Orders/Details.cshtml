@@ -14,6 +14,15 @@
     </section>
 }
 
+@* cancel-step4 *@
+@if (TempData["OrderMessage"] is string buyerOrderMessage)
+{
+    <div class="alert alert--success" role="status">@buyerOrderMessage</div>
+}
+@if (TempData["OrderError"] is string buyerOrderError)
+{
+    <div class="alert alert--error" role="alert">@buyerOrderError</div>
+}
 <h1>Order <span class="order-number">@Model.OrderNumber</span></h1>
 <p class="muted">
     Placed @OrderLabels.When(Model.CreatedAt) from
@@ -49,6 +58,31 @@
 </div>
 <p class="cart-total">Total: @MoneyFormatter.Zmw(Model.Total)</p>
 
+@{
+    var orderIdValue = Context.Request.RouteValues["id"]?.ToString();
+    var canCancel = Zitbaba.Web.Domain.Rules.OrderRules.CanTransition(
+        Model.Status,
+        Zitbaba.Web.Domain.Enums.OrderStatus.CancelledByBuyer,
+        Zitbaba.Web.Domain.Rules.OrderActor.Buyer);
+}
+@if (canCancel)
+{
+    <section class="card" aria-labelledby="cancel-heading">
+        <h2 id="cancel-heading">Changed your mind?</h2>
+        <p class="hint">You can cancel until the seller marks the order ready for pickup. The items go back into stock.</p>
+        <form asp-controller="Orders" asp-action="Cancel" asp-route-id="@orderIdValue" method="post" class="action-form" data-submit-once>
+            <div class="field">
+                <label for="cancel-reason">Reason (optional)</label>
+                <textarea id="cancel-reason" name="reason" rows="2" maxlength="500" class="reason-input"></textarea>
+            </div>
+            <button type="submit" class="btn btn--secondary">Cancel this order</button>
+        </form>
+    </section>
+}
+else if (Model.Status == Zitbaba.Web.Domain.Enums.OrderStatus.ReadyForPickup)
+{
+    <p class="hint">This order is ready for pickup, so it can no longer be cancelled here. Please speak to the seller.</p>
+}
 <h2>History</h2>
 <ol>
     @foreach (var entry in Model.History)
@@ -67,3 +101,4 @@
     <a asp-controller="Orders" asp-action="Index">All my orders</a> &middot;
     <a asp-controller="Home" asp-action="Search">Continue shopping</a>
 </p>
+

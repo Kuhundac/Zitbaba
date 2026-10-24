@@ -163,3 +163,25 @@ The first run creates the `Zitbaba_Test` database and applies the migrations. Ne
 
 **Service registration test:** every controller, view component and service that needs an app service must
 have it registered in `AddZitbabaServices`; `ServiceRegistrationTests` fails with the missing names if not.
+
+## Day 5 notes
+
+**Order lifecycle:** Pending, Accepted, Ready for pickup, Completed, with Rejected and Cancelled by buyer as the other endings. The allowed changes live in one place, `Domain/Rules/OrderRules.cs`.
+
+| Action | Who | From | To |
+|---|---|---|---|
+| Accept | Seller | Pending | Accepted |
+| Reject (reason required) | Seller | Pending | Rejected |
+| Mark ready | Seller | Accepted | Ready for pickup |
+| Complete (cash received) | Seller | Ready for pickup | Completed, payment Paid |
+| Cancel | Buyer | Pending or Accepted | Cancelled by buyer |
+
+**Stock:** rejecting or cancelling puts the stock back in the same transaction as the status change. The status change is a single conditional update, so if a buyer cancels while the seller accepts, exactly one of them wins.
+
+**Privacy:** a seller sees the buyer's name and phone only on that order's page, and only while the order is open. The phone is hidden once the order is closed.
+
+**Ownership:** sellers can only act on their own store's orders and buyers on their own. Anyone else gets a 404 and an `AccessDenied` audit row.
+
+**Suspended sellers:** cannot accept new orders (the whole seller area also requires an approved seller).
+
+**Audit actions:** OrderAccepted, OrderRejected, OrderReadyForPickup, OrderCompleted, OrderCancelled, AccessDenied.

@@ -79,6 +79,16 @@ public class OrderTransitionService : IOrderTransitionService
             return new TransitionResult(TransitionOutcome.NotFound, "That order was not found.");
         }
 
+        // BR-002: a suspended (or otherwise not approved) seller cannot accept new orders.
+        if (actor == OrderActor.Seller && to == OrderStatus.Accepted)
+        {
+            var sellerApproved = await _db.SellerProfiles.AsNoTracking().AnyAsync(s =>
+                s.UserId == actorUserId && s.ApplicationStatus == SellerApplicationStatus.Approved);
+            if (!sellerApproved)
+                return new TransitionResult(TransitionOutcome.NotAllowed,
+                    "Your seller account cannot accept new orders right now."); // SellerNotApproved
+        }
+
         reason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
         if (reason is { Length: > ReasonMax }) reason = reason[..ReasonMax];
 
@@ -212,3 +222,4 @@ public class OrderTransitionService : IOrderTransitionService
         _ => "Order updated."
     };
 }
+
