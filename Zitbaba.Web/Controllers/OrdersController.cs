@@ -43,9 +43,10 @@ public class OrdersController : Controller
         if (result.Outcome == TransitionOutcome.NotFound) return NotFound();
 
         TempData[result.Succeeded ? "OrderMessage" : "OrderError"] = result.Message;
-        return RedirectToAction(nameof(Details), new { id });
+        return RedirectToAction(nameof(Details), "Orders", new { area = "", id });
     }
 
     private bool TryGetUserId(out Guid userId) =>
         Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId);
 }
+

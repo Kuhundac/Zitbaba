@@ -54,6 +54,7 @@ public class OrdersController : Controller
     {
         var result = await action(User.GetUserId());
         TempData[result.Succeeded ? "OrderMessage" : "OrderError"] = result.Message;
-        return RedirectToAction(nameof(Details), new { id });
+        return RedirectToAction(nameof(Details), "Orders", new { area = "Seller", id });
     }
 }
+
