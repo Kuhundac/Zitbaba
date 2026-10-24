@@ -1,0 +1,74 @@
+﻿@model Zitbaba.Web.Services.PagedResult<Zitbaba.Web.Services.SellerOrderRow>
+@using Zitbaba.Web.Infrastructure.Extensions
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "Orders";
+    var filter = (SellerOrderFilter)(ViewData["Filter"] ?? SellerOrderFilter.Pending);
+    string? PageUrl(int p) => Url.Action("Index", "Orders", new { area = "Seller", filter = filter, page = p });
+    string Chip(SellerOrderFilter f) => f == filter ? "chip is-active" : "chip";
+}
+
+<div class="page-head">
+    <h1>Orders</h1>
+    <a asp-area="Seller" asp-controller="Home" asp-action="Index">Back to dashboard</a>
+</div>
+
+<nav class="chips" aria-label="Order filter">
+    <a class="@Chip(SellerOrderFilter.Pending)" asp-area="Seller" asp-controller="Orders" asp-action="Index" asp-route-filter="Pending">New</a>
+    <a class="@Chip(SellerOrderFilter.InProgress)" asp-area="Seller" asp-controller="Orders" asp-action="Index" asp-route-filter="InProgress">In progress</a>
+    <a class="@Chip(SellerOrderFilter.Closed)" asp-area="Seller" asp-controller="Orders" asp-action="Index" asp-route-filter="Closed">Closed</a>
+    <a class="@Chip(SellerOrderFilter.All)" asp-area="Seller" asp-controller="Orders" asp-action="Index" asp-route-filter="All">All</a>
+</nav>
+
+@if (Model.Items.Count == 0)
+{
+    <p>No orders here yet.</p>
+}
+else
+{
+    <p class="result-count" role="status">
+        @(Model.TotalCount == 1 ? "1 order" : Model.TotalCount + " orders")
+    </p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Buyer</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Items</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Placed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-area="Seller" asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderId">@order.OrderNumber</a></td>
+                        <td>@order.BuyerName</td>
+                        <td>@OrderLabels.Status(order.Status)</td>
+                        <td>@order.ItemCount</td>
+                        <td>@MoneyFormatter.Zmw(order.Total)</td>
+                        <td>@OrderLabels.When(order.CreatedAt)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (Model.HasPrevious)
+        {
+            <a href="@PageUrl(Model.Page - 1)">Previous</a>
+        }
+        <span>Page @Model.Page of @Model.TotalPages</span>
+        @if (Model.HasNext)
+        {
+            <a href="@PageUrl(Model.Page + 1)">Next</a>
+        }
+    </nav>
+}

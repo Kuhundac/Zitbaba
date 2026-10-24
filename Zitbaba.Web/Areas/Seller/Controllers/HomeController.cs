@@ -11,9 +11,18 @@ namespace Zitbaba.Web.Areas.Seller.Controllers;
 public class HomeController : Controller
 {
     private readonly ISellerProductService _products;
+    private readonly ISellerOrderService _orders;
 
-    public HomeController(ISellerProductService products) => _products = products;
+    public HomeController(ISellerProductService products, ISellerOrderService orders)
+    {
+        _products = products;
+        _orders = orders;
+    }
 
-    public async Task<IActionResult> Index() =>
-        View(await _products.GetDashboardAsync(User.GetUserId()));
+    public async Task<IActionResult> Index()
+    {
+        var userId = User.GetUserId();
+        ViewData["PendingOrders"] = await _orders.CountPendingAsync(userId);
+        return View(await _products.GetDashboardAsync(userId));
+    }
 }

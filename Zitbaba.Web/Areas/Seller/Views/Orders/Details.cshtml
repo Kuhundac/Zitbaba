@@ -1,0 +1,121 @@
+﻿@model Zitbaba.Web.Services.SellerOrderDetail
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "Order " + Model.OrderNumber;
+    var canAccept = Model.Actions.Contains(OrderStatus.Accepted);
+    var canReject = Model.Actions.Contains(OrderStatus.Rejected);
+    var canReady = Model.Actions.Contains(OrderStatus.ReadyForPickup);
+    var canComplete = Model.Actions.Contains(OrderStatus.Completed);
+}
+
+<div class="page-head">
+    <h1>Order <span class="order-number">@Model.OrderNumber</span></h1>
+    <a asp-area="Seller" asp-controller="Orders" asp-action="Index">All orders</a>
+</div>
+
+@if (TempData["OrderMessage"] is string orderMessage)
+{
+    <div class="alert alert--success" role="status">@orderMessage</div>
+}
+@if (TempData["OrderError"] is string orderError)
+{
+    <div class="alert alert--error" role="alert">@orderError</div>
+}
+
+<p class="muted">Placed @OrderLabels.When(Model.CreatedAt)</p>
+<p><strong>Status:</strong> @OrderLabels.Status(Model.Status)</p>
+<p><strong>Payment:</strong> @OrderLabels.Payment(Model.PaymentStatus)</p>
+
+<section class="card" aria-labelledby="buyer-heading">
+    <h2 id="buyer-heading">Buyer</h2>
+    <p><strong>@Model.BuyerName</strong></p>
+    @if (Model.BuyerPhone is not null)
+    {
+        <p>Phone: @Model.BuyerPhone</p>
+        <p class="hint">Use this number only to arrange pickup of this order.</p>
+    }
+    else
+    {
+        <p class="muted">Contact details are hidden once an order is closed.</p>
+    }
+</section>
+
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>@line.ProductName</td>
+                    <td>@MoneyFormatter.Zmw(line.UnitPrice)</td>
+                    <td>@line.Quantity</td>
+                    <td>@MoneyFormatter.Zmw(line.LineTotal)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<p class="cart-total">Total: @MoneyFormatter.Zmw(Model.Total)</p>
+
+@if (canAccept || canReject || canReady || canComplete)
+{
+    <section class="card" aria-labelledby="actions-heading">
+        <h2 id="actions-heading">What would you like to do?</h2>
+
+        @if (canAccept)
+        {
+            <form asp-area="Seller" asp-controller="Orders" asp-action="Accept" asp-route-id="@Model.OrderId" method="post" class="action-form" data-submit-once>
+                <button type="submit" class="btn">Accept order</button>
+            </form>
+        }
+
+        @if (canReady)
+        {
+            <form asp-area="Seller" asp-controller="Orders" asp-action="Ready" asp-route-id="@Model.OrderId" method="post" class="action-form" data-submit-once>
+                <button type="submit" class="btn">Mark ready for pickup</button>
+            </form>
+        }
+
+        @if (canComplete)
+        {
+            <p class="hint">Only do this after the buyer has collected the order and you have received the cash.</p>
+            <form asp-area="Seller" asp-controller="Orders" asp-action="Complete" asp-route-id="@Model.OrderId" method="post" class="action-form" data-submit-once>
+                <button type="submit" class="btn">Mark completed (cash received)</button>
+            </form>
+        }
+
+        @if (canReject)
+        {
+            <form asp-area="Seller" asp-controller="Orders" asp-action="Reject" asp-route-id="@Model.OrderId" method="post" class="action-form" data-submit-once>
+                <div class="field">
+                    <label for="reject-reason">Reject this order. Reason (the buyer will see it)</label>
+                    <textarea id="reject-reason" name="reason" rows="3" maxlength="500" required class="reason-input"></textarea>
+                </div>
+                <button type="submit" class="btn btn--secondary">Reject order</button>
+            </form>
+        }
+    </section>
+}
+
+<h2>History</h2>
+<ol>
+    @foreach (var entry in Model.History)
+    {
+        <li>
+            @OrderLabels.Status(entry.To) &middot; @OrderLabels.When(entry.At)
+            @if (!string.IsNullOrWhiteSpace(entry.Reason))
+            {
+                <span class="muted"> &middot; @entry.Reason</span>
+            }
+        </li>
+    }
+</ol>

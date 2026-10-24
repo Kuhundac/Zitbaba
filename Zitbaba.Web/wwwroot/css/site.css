@@ -163,3 +163,7 @@ textarea { padding: .5rem .75rem; border: 1px solid #9CA3AF; border-radius: var(
 /* orders-step5 */
 .order-number { font-weight: 700; letter-spacing: 0.02em; }
 .confirm-panel { border-left: 4px solid var(--color-primary, #6D28D9); }
+
+/* seller-orders-step3 */
+.chip.is-active { font-weight: 700; border-color: currentColor; }
+.reason-input { width: 100%; max-width: 32rem; }

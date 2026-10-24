@@ -18,6 +18,7 @@
     <div class="stat"><div class="stat-value">@Model.DraftCount</div><div>Draft</div></div>
     <div class="stat"><div class="stat-value">@Model.InactiveCount</div><div>Inactive</div></div>
     <div class="stat"><div class="stat-value">@Model.PendingModerationCount</div><div>Pending review</div></div>
+    <div class="stat"><div class="stat-value">@ViewData["PendingOrders"]</div><div>New orders</div></div>
 </div>
 
 <h2>Low stock</h2>
@@ -39,4 +40,6 @@ else
     </ul>
 }
 
+<p><a class="btn" asp-area="Seller" asp-controller="Orders" asp-action="Index">View orders</a></p>
 <p><a asp-area="Seller" asp-controller="Products" asp-action="Index">View all my products</a></p>
+
