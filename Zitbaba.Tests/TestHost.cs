@@ -42,6 +42,7 @@ internal sealed class TestHost : IDisposable
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<ICheckoutService, CheckoutService>();
         services.AddScoped<IBuyerOrderService, BuyerOrderService>();
+        services.AddScoped<IOrderTransitionService, OrderTransitionService>();
         _provider = services.BuildServiceProvider();
     }
 
@@ -57,6 +58,7 @@ internal sealed class TestHost : IDisposable
 
     public void Dispose() => _provider.Dispose();
 }
+
 
 
 
