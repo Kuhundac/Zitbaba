@@ -1,0 +1,62 @@
+﻿@model Zitbaba.Web.Services.PagedResult<Zitbaba.Web.Services.OrderListItem>
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "My orders";
+    string? PageUrl(int p) => Url.Action("Index", "Orders", new { page = p });
+}
+
+<h1>My orders</h1>
+
+@if (Model.Items.Count == 0)
+{
+    <p>You have not placed any orders yet.</p>
+    <p><a class="btn" asp-controller="Home" asp-action="Search">Browse products</a></p>
+}
+else
+{
+    <p class="result-count" role="status">
+        @(Model.TotalCount == 1 ? "1 order" : Model.TotalCount + " orders")
+    </p>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Seller</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Items</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Placed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderId">@order.OrderNumber</a></td>
+                        <td>@order.StoreName</td>
+                        <td>@OrderLabels.Status(order.Status)</td>
+                        <td>@order.ItemCount</td>
+                        <td>@MoneyFormatter.Zmw(order.Total)</td>
+                        <td>@OrderLabels.When(order.CreatedAt)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (Model.HasPrevious)
+        {
+            <a href="@PageUrl(Model.Page - 1)">Previous</a>
+        }
+        <span>Page @Model.Page of @Model.TotalPages</span>
+        @if (Model.HasNext)
+        {
+            <a href="@PageUrl(Model.Page + 1)">Next</a>
+        }
+    </nav>
+}

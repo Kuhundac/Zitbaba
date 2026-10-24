@@ -7,3 +7,11 @@
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 })();
+
+/* submit-once-step5 */
+document.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!form || !form.hasAttribute || !form.hasAttribute('data-submit-once')) return;
+    var button = form.querySelector('button[type="submit"]');
+    if (button) { button.disabled = true; }
+});

@@ -1,0 +1,59 @@
+﻿@model Zitbaba.Web.Models.CheckoutPageModel
+@using System.Globalization
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "Checkout";
+    var cart = Model.Cart;
+    var totalText = cart.Total.ToString(CultureInfo.InvariantCulture);
+}
+
+<h1>Checkout</h1>
+
+@if (TempData["Error"] is string checkoutError)
+{
+    <p role="alert" class="field-error">@checkoutError</p>
+}
+
+<section class="card" aria-labelledby="order-heading">
+    <h2 id="order-heading">Your order from @cart.StoreName</h2>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in cart.Lines)
+                {
+                    <tr>
+                        <td>@line.Name</td>
+                        <td>@MoneyFormatter.Zmw(line.UnitPrice)</td>
+                        <td>@line.Quantity</td>
+                        <td>@MoneyFormatter.Zmw(line.LineTotal)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="cart-total">Total: @MoneyFormatter.Zmw(cart.Total)</p>
+</section>
+
+<section class="card" aria-labelledby="pay-heading">
+    <h2 id="pay-heading">Payment and pickup</h2>
+    <p><strong>Payment:</strong> cash, when you collect your order.</p>
+    <p><strong>Pickup:</strong> from the seller. The seller accepts your order first, then you collect it and pay.</p>
+    <p class="hint">Stock is reserved only when you place the order. If an item sells out first, you will be told which one.</p>
+</section>
+
+<form asp-controller="Checkout" asp-action="Place" method="post" class="action-form" data-submit-once>
+    <input type="hidden" name="submissionKey" value="@Model.SubmissionKey" />
+    <input type="hidden" name="expectedTotal" value="@totalText" />
+    <div class="cart-actions">
+        <button type="submit" class="btn">Place order</button>
+        <a asp-controller="Cart" asp-action="Index">Back to cart</a>
+    </div>
+</form>

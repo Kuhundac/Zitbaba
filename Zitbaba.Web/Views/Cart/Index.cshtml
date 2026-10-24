@@ -79,7 +79,14 @@ else
             <form asp-controller="Cart" asp-action="Clear" method="post" class="action-form">
                 <button type="submit" class="btn btn--secondary">Clear cart</button>
             </form>
-            <button type="button" class="btn" disabled>Checkout</button>
+            @if (Model.HasProblems)
+            {
+                <button type="button" class="btn" disabled>Checkout</button>
+            }
+            else
+            {
+                <a class="btn" asp-controller="Checkout" asp-action="Index">Checkout</a>
+            }
         </div>
     </div>
 
@@ -89,3 +96,4 @@ else
     }
     <p><a asp-controller="Home" asp-action="Search">Continue shopping</a></p>
 }
+

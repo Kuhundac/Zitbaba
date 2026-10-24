@@ -1,0 +1,69 @@
+﻿@model Zitbaba.Web.Services.OrderDetail
+@using Zitbaba.Web.Infrastructure.Extensions
+@{
+    ViewData["Title"] = "Order " + Model.OrderNumber;
+    var justPlaced = TempData["Placed"] is string;
+}
+
+@if (justPlaced)
+{
+    <section class="card confirm-panel" role="status">
+        <h2>Thank you, your order has been placed.</h2>
+        <p>Your order number is <strong>@Model.OrderNumber</strong>. Quote it when you collect.</p>
+        <p>The seller will accept your order first. You pay cash when you collect it.</p>
+    </section>
+}
+
+<h1>Order <span class="order-number">@Model.OrderNumber</span></h1>
+<p class="muted">
+    Placed @OrderLabels.When(Model.CreatedAt) from
+    <a asp-controller="Store" asp-action="Index" asp-route-id="@Model.SellerProfileId">@Model.StoreName</a>
+</p>
+
+<p><strong>Status:</strong> @OrderLabels.Status(Model.Status)</p>
+<p><strong>Payment:</strong> @OrderLabels.Payment(Model.PaymentStatus)</p>
+<p><strong>Collection:</strong> pickup from the seller</p>
+
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th scope="col">Item</th>
+                <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>@line.ProductName</td>
+                    <td>@MoneyFormatter.Zmw(line.UnitPrice)</td>
+                    <td>@line.Quantity</td>
+                    <td>@MoneyFormatter.Zmw(line.LineTotal)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<p class="cart-total">Total: @MoneyFormatter.Zmw(Model.Total)</p>
+
+<h2>History</h2>
+<ol>
+    @foreach (var entry in Model.History)
+    {
+        <li>
+            @OrderLabels.Status(entry.To) &middot; @OrderLabels.When(entry.At)
+            @if (!string.IsNullOrWhiteSpace(entry.Reason))
+            {
+                <span class="muted"> &middot; @entry.Reason</span>
+            }
+        </li>
+    }
+</ol>
+
+<p>
+    <a asp-controller="Orders" asp-action="Index">All my orders</a> &middot;
+    <a asp-controller="Home" asp-action="Search">Continue shopping</a>
+</p>

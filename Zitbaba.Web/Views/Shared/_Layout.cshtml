@@ -32,6 +32,10 @@
                 <a class="@Cls("Home","Search")" aria-current="@(IsActive("Home","Search") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Search">Search</a>
                 <a class="@Cls("Home","Wishlist")" aria-current="@(IsActive("Home","Wishlist") ? "page" : null)" asp-area="" asp-controller="Home" asp-action="Wishlist">Wishlist</a>
                 @await Component.InvokeAsync("CartCount")
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a class="nav-link" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
+                }
 
                 <details class="account-menu">
                     <summary class="nav-link">Account</summary>
@@ -57,4 +61,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
 

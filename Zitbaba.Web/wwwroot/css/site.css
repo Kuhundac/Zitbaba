@@ -159,3 +159,7 @@ textarea { padding: .5rem .75rem; border: 1px solid #9CA3AF; border-radius: var(
 .cart-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
 .cart-total { font-size: 1.25rem; font-weight: 700; margin: 0; }
 .cart-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+/* orders-step5 */
+.order-number { font-weight: 700; letter-spacing: 0.02em; }
+.confirm-panel { border-left: 4px solid var(--color-primary, #6D28D9); }
