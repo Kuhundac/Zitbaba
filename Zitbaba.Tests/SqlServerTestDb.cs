@@ -30,6 +30,8 @@ internal static class SqlServerTestDb
     {
         var cs = Environment.GetEnvironmentVariable(EnvVar)
                  ?? throw new InvalidOperationException(EnvVar + " is not set.");
+        var database = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(cs).InitialCatalog;
+        if (!string.Equals(database, "Zitbaba_Test", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException(EnvVar + " must use the database Zitbaba_Test. Refusing to run against database " + database + ".");
         var options = new DbContextOptionsBuilder<ZitbabaDbContext>().UseSqlServer(cs).Options;
 
         if (!_ready)
@@ -110,3 +112,4 @@ internal static class SqlServerTestDb
         return product;
     }
 }
+
