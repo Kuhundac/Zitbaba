@@ -1,0 +1,62 @@
+﻿@model AdminUserDetails
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "User: " + Model.FullName;
+    var accountBadge = AccountStatusBadges.For(Model.Status);
+}
+
+<p><a asp-area="Admin" asp-controller="Users" asp-action="Index">Back to users</a></p>
+
+@if (TempData["Message"] is string message)
+{
+    <p role="status">@message</p>
+}
+@if (TempData["Error"] is string error)
+{
+    <p role="alert" class="field-error">@error</p>
+}
+
+<div class="card">
+    <h1>@Model.FullName</h1>
+    <p><partial name="_StatusBadge" model="accountBadge" /></p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Joined:</strong> @Model.CreatedAt.ToString("dd MMM yyyy HH:mm") (UTC)</p>
+    @if (Model.IsAdmin)
+    {
+        <p><strong>Role:</strong> Administrator</p>
+    }
+    @if (Model.SellerStatus is SellerApplicationStatus sellerStatus)
+    {
+        var sellerBadge = SellerStatusBadges.For(sellerStatus);
+        <p><strong>Seller account:</strong> @Model.StoreName</p>
+        <p><partial name="_StatusBadge" model="sellerBadge" /></p>
+    }
+</div>
+
+@if (Model.Status == AccountStatus.Active && !Model.IsAdmin)
+{
+    <form asp-area="Admin" asp-controller="Users" asp-action="Suspend" asp-route-id="@Model.UserId" method="post" class="action-form">
+        <div class="field">
+            <label for="suspend-reason">Reason for suspending (5 to 500 characters)</label>
+            <textarea id="suspend-reason" name="reason" rows="3" maxlength="500" required></textarea>
+            <span class="hint">The person is signed out within about a minute. If they have an approved seller account, it is suspended too.</span>
+        </div>
+        <button type="submit" class="btn btn--block">Suspend account</button>
+    </form>
+}
+else if (Model.Status == AccountStatus.Suspended)
+{
+    <form asp-area="Admin" asp-controller="Users" asp-action="Reactivate" asp-route-id="@Model.UserId" method="post" class="action-form">
+        <p class="muted">Reactivating lets the person sign in again. A suspended seller account stays suspended until you reinstate it under Seller applications.</p>
+        <button type="submit" class="btn btn--block">Reactivate account</button>
+    </form>
+}
+else if (Model.IsAdmin)
+{
+    <p class="muted">Administrator accounts cannot be suspended here.</p>
+}
+else
+{
+    <p class="muted">This account is deactivated.</p>
+}

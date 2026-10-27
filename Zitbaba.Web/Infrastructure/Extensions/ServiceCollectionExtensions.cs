@@ -50,6 +50,8 @@ public static class ServiceCollectionExtensions
             o.ExpireTimeSpan = TimeSpan.FromDays(7);
         });
 
+        services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
+
         services.AddAntiforgery(o =>
         {
             o.Cookie.HttpOnly = true;
@@ -111,6 +113,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISellerOrderService, SellerOrderService>();
         services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IAdminUserService, AdminUserService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISellerProductService, SellerProductService>();
         services.AddSingleton<IImageStorage, LocalImageStorage>();
@@ -118,6 +121,8 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
+
 
 
 

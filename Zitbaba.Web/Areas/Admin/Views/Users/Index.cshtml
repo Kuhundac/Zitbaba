@@ -1,0 +1,75 @@
+﻿@model AdminUsersIndexModel
+@using Zitbaba.Web.Domain.Enums
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "Users";
+    var result = Model.Result;
+    string? PageUrl(int p) => Url.Action("Index", "Users", new { area = "Admin", q = Model.Search, page = p });
+}
+
+<h1>Users</h1>
+
+@if (TempData["Message"] is string message)
+{
+    <p role="status">@message</p>
+}
+@if (TempData["Error"] is string error)
+{
+    <p role="alert" class="field-error">@error</p>
+}
+
+<form class="filter-form" role="search" asp-area="Admin" asp-controller="Users" asp-action="Index" method="get">
+    <div class="field">
+        <label for="q">Search by name or email</label>
+        <input id="q" name="q" type="search" maxlength="100" value="@Model.Search" autocomplete="off" />
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn">Search</button>
+        @if (!string.IsNullOrWhiteSpace(Model.Search))
+        {
+            <a asp-area="Admin" asp-controller="Users" asp-action="Index">Clear search</a>
+        }
+    </div>
+</form>
+
+<p class="result-count" role="status">@(result.TotalCount == 1 ? "1 user" : result.TotalCount + " users")</p>
+
+@if (result.Items.Count == 0)
+{
+    <p>No users match your search.</p>
+}
+
+@foreach (var item in result.Items)
+{
+    var accountBadge = AccountStatusBadges.For(item.Status);
+    <div class="card list-card">
+        <h2><a asp-area="Admin" asp-controller="Users" asp-action="Details" asp-route-id="@item.UserId">@item.FullName</a></h2>
+        <p><partial name="_StatusBadge" model="accountBadge" /></p>
+        <p>@item.Email</p>
+        @if (item.IsAdmin)
+        {
+            <p class="muted">Administrator</p>
+        }
+        @if (item.SellerStatus is SellerApplicationStatus sellerStatus)
+        {
+            var sellerBadge = SellerStatusBadges.For(sellerStatus);
+            <p>Seller: <partial name="_StatusBadge" model="sellerBadge" /></p>
+        }
+        <p class="muted">Joined @item.CreatedAt.ToString("dd MMM yyyy") (UTC)</p>
+    </div>
+}
+
+@if (result.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (result.HasPrevious)
+        {
+            <a href="@PageUrl(result.Page - 1)">Previous</a>
+        }
+        <span>Page @result.Page of @result.TotalPages</span>
+        @if (result.HasNext)
+        {
+            <a href="@PageUrl(result.Page + 1)">Next</a>
+        }
+    </nav>
+}
