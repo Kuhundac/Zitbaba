@@ -1,4 +1,4 @@
-# Zitbaba
+﻿# Zitbaba
 
 Multi-vendor university marketplace for Copperbelt University (currency: ZMW).
 Day 1 skeleton: accounts, roles, seller/catalogue schema, themed layout, health check, CI.
@@ -20,7 +20,7 @@ dotnet restore
 # Seed admin (never commit these). Stored outside the repo in user-secrets:
 cd Zitbaba.Web
 dotnet user-secrets set "Seed:AdminEmail" "admin@zitbaba.local"
-dotnet user-secrets set "Seed:AdminPassword" "ChangeMe123"
+dotnet user-secrets set "Seed:AdminPassword" "<choose-a-strong-password>"
 cd ..
 ```
 
@@ -185,3 +185,4 @@ have it registered in `AddZitbabaServices`; `ServiceRegistrationTests` fails wit
 **Suspended sellers:** cannot accept new orders (the whole seller area also requires an approved seller).
 
 **Audit actions:** OrderAccepted, OrderRejected, OrderReadyForPickup, OrderCompleted, OrderCancelled, AccessDenied.
+
