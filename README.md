@@ -186,3 +186,23 @@ have it registered in `AddZitbabaServices`; `ServiceRegistrationTests` fails wit
 
 **Audit actions:** OrderAccepted, OrderRejected, OrderReadyForPickup, OrderCompleted, OrderCancelled, AccessDenied.
 
+
+## Production settings checklist (Day 6)
+
+Set these as **App Service application settings** (environment variables). Never commit them.
+
+| Setting | Value |
+|---|---|
+| `ASPNETCORE_ENVIRONMENT` | `Production` |
+| `ConnectionStrings__DefaultConnection` | the Azure SQL connection string |
+| `Seed__AdminEmail`, `Seed__AdminPassword` | first deploy only, with a NEW strong password; delete both after the admin exists |
+| `ASPNETCORE_FORWARDEDHEADERS_ENABLED` | `true` (Linux App Service or any proxy), so the rate limiter sees real visitor addresses and HTTPS redirects do not loop |
+| `AllowedHosts` | your real hostname instead of `*` |
+| `Marketplace__RequireListingModeration` | `false` (a product approval page does not exist yet) |
+
+**Migrations are a separate step and never run on app start in Production.**
+Generate a script, review it, run it against the production database, then restart the app:
+
+    dotnet ef migrations script --idempotent --project Zitbaba.Web --output migrate.sql
+
+Until pending migrations are applied, a Production start skips seeding and logs a warning.
