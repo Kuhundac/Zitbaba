@@ -20,7 +20,19 @@
 </div>
 
 <div class="card list-card">
+    <h2>Users</h2>
+    <p>Search accounts, suspend or reactivate them.</p>
+    <a class="btn" asp-area="Admin" asp-controller="Users" asp-action="Index">Manage users</a>
+</div>
+
+<div class="card list-card">
     <h2>Categories</h2>
     <p>Add, rename and deactivate product categories.</p>
     <a class="btn" asp-area="Admin" asp-controller="Categories" asp-action="Index">Manage categories</a>
+</div>
+
+<div class="card list-card">
+    <h2>Audit log</h2>
+    <p>See who did what and when.</p>
+    <a class="btn" asp-area="Admin" asp-controller="AuditLog" asp-action="Index">View audit log</a>
 </div>

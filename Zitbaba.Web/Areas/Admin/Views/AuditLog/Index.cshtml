@@ -1,0 +1,133 @@
+﻿@model AuditLogPageModel
+@using Zitbaba.Web.Services
+@{
+    ViewData["Title"] = "Audit log";
+    var filter = Model.Filter;
+    var result = Model.Result;
+    var fromValue = filter.From?.ToString("yyyy-MM-dd");
+    var toValue = filter.To?.ToString("yyyy-MM-dd");
+    var hasFilters = !string.IsNullOrWhiteSpace(filter.Action)
+        || !string.IsNullOrWhiteSpace(filter.EntityType)
+        || !string.IsNullOrWhiteSpace(filter.EntityId)
+        || !string.IsNullOrWhiteSpace(filter.Actor)
+        || filter.From is not null
+        || filter.To is not null;
+    string? PageUrl(int p) => Url.Action("Index", "AuditLog", new
+    {
+        area = "Admin",
+        actionName = filter.Action,
+        entityType = filter.EntityType,
+        entityId = filter.EntityId,
+        actor = filter.Actor,
+        fromDate = fromValue,
+        toDate = toValue,
+        page = p
+    });
+}
+
+<h1>Audit log</h1>
+<p class="muted">Read-only record of important actions. Times are UTC.</p>
+
+<form class="filter-form" role="search" asp-area="Admin" asp-controller="AuditLog" asp-action="Index" method="get">
+    <div class="field">
+        <label for="actionName">Action</label>
+        <select id="actionName" name="actionName">
+            <option value="">All actions</option>
+            @foreach (var a in Model.Actions)
+            {
+                <option value="@a" selected="@(filter.Action == a)">@a</option>
+            }
+        </select>
+    </div>
+    <div class="field">
+        <label for="entityType">Entity type</label>
+        <select id="entityType" name="entityType">
+            <option value="">All types</option>
+            @foreach (var t in Model.EntityTypes)
+            {
+                <option value="@t" selected="@(filter.EntityType == t)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="field">
+        <label for="actor">Who (name)</label>
+        <input id="actor" name="actor" type="search" maxlength="100" value="@filter.Actor" autocomplete="off" />
+    </div>
+    <div class="field">
+        <label for="entityId">Entity id (exact)</label>
+        <input id="entityId" name="entityId" type="search" maxlength="100" value="@filter.EntityId" autocomplete="off" />
+    </div>
+    <div class="field">
+        <label for="fromDate">From date</label>
+        <input id="fromDate" name="fromDate" type="date" value="@fromValue" />
+    </div>
+    <div class="field">
+        <label for="toDate">To date</label>
+        <input id="toDate" name="toDate" type="date" value="@toValue" />
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn">Apply</button>
+        @if (hasFilters)
+        {
+            <a asp-area="Admin" asp-controller="AuditLog" asp-action="Index">Clear filters</a>
+        }
+    </div>
+</form>
+
+<p class="result-count" role="status">@(result.TotalCount == 1 ? "1 entry" : result.TotalCount + " entries")</p>
+
+@if (result.Items.Count == 0)
+{
+    <p>No entries match these filters.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th scope="col">When (UTC)</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Who</th>
+                    <th scope="col">What</th>
+                    <th scope="col">Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in result.Items)
+                {
+                    <tr>
+                        <td>@row.Timestamp.ToString("dd MMM yyyy HH:mm:ss")</td>
+                        <td>@row.Action</td>
+                        <td>@(row.ActorName ?? (row.ActorUserId is null ? "System" : "Unknown user"))</td>
+                        <td>@row.EntityType<br /><span class="audit-id">@row.EntityId</span></td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(row.Metadata))
+                            {
+                                <details>
+                                    <summary>Show</summary>
+                                    <pre class="audit-meta">@row.Metadata</pre>
+                                </details>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (result.TotalPages > 1)
+{
+    <nav class="pager" aria-label="Pages">
+        @if (result.HasPrevious)
+        {
+            <a href="@PageUrl(result.Page - 1)">Previous</a>
+        }
+        <span>Page @result.Page of @result.TotalPages</span>
+        @if (result.HasNext)
+        {
+            <a href="@PageUrl(result.Page + 1)">Next</a>
+        }
+    </nav>
+}

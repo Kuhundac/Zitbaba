@@ -114,6 +114,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISellerApprovalQueryService, SellerApprovalQueryService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<IAdminUserService, AdminUserService>();
+        services.AddScoped<IAuditLogQueryService, AuditLogQueryService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISellerProductService, SellerProductService>();
         services.AddSingleton<IImageStorage, LocalImageStorage>();
@@ -121,6 +122,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 }
+
 
 
 

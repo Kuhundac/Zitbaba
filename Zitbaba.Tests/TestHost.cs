@@ -33,6 +33,7 @@ internal sealed class TestHost : IDisposable
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<IAdminUserService, AdminUserService>();
+        services.AddScoped<IAuditLogQueryService, AuditLogQueryService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISellerApplicationService, SellerApplicationService>();
         services.AddScoped<ISellerProductService, SellerProductService>();
@@ -60,6 +61,7 @@ internal sealed class TestHost : IDisposable
 
     public void Dispose() => _provider.Dispose();
 }
+
 
 
 

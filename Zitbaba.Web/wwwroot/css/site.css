@@ -167,3 +167,7 @@ textarea { padding: .5rem .75rem; border: 1px solid #9CA3AF; border-radius: var(
 /* seller-orders-step3 */
 .chip.is-active { font-weight: 700; border-color: currentColor; }
 .reason-input { width: 100%; max-width: 32rem; }
+
+/* auditlog-step3 */
+.audit-id { overflow-wrap: anywhere; font-size: .85rem; }
+.audit-meta { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; margin: .25rem 0 0; }
